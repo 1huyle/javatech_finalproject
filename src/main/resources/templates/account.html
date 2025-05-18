@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý tài khoản cá nhân trên Real Estate. Cập nhật thông tin, đổi mật khẩu, xem lịch sử giao dịch và bất động sản yêu thích.">
+    <meta name="keywords" content="quản lý tài khoản, bất động sản, lịch sử giao dịch, yêu thích bất động sản, Việt Nam">
+    <meta name="author" content="Bất Động Sản">
+    <title>Quản lý tài khoản - Bất Động Sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <link href="../assets/css/account.css" rel="stylesheet">
+
+</head>
+<body>
+    <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
+    <!-- Header -->
+    <div th:replace="header :: header"></div>
+
+    <!-- Main Content -->
+    <main class="container py-5" aria-labelledby="account-title">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 sidebar">
+                <div class="card mb-4 fade-in">
+                    <div class="card-body text-center">
+                        <div class="avatar-container">
+                            <img src="../assets/images/avatar-default.jpg" alt="Avatar" class="rounded-circle" width="100" id="userAvatar">
+                        </div>
+                        <h5 class="card-title" id="userName"></h5>
+                        <p class="text-muted" id="userEmail"></p>
+                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#changeAvatarModal">
+                            <i class="bi bi-camera me-2"></i>Đổi ảnh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="list-group">
+                    <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="list" aria-current="true">
+                        <i class="bi bi-person me-2"></i>Thông tin cá nhân
+                    </a>
+                    <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-shield-lock me-2"></i>Bảo mật
+                    </a>
+                    <a href="#properties" class="list-group-item list-group-item-action realtor-only" data-bs-toggle="list" id="propertiesTab">
+                        <i class="bi bi-building me-2"></i>Quản lý BĐS
+                    </a>
+                    <a href="#transactions" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-credit-card me-2"></i>Giao dịch
+                    </a>
+                    <a href="#favorites" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-heart me-2"></i>Yêu thích
+                    </a>
+                    <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-bell me-2"></i>Thông báo
+                    </a>
+                </div>
+                
+                <!-- Hiển thị các thông báo mới cho Realtor -->
+                <div class="card mt-4 fade-in realtor-only">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0 fs-6"><i class="bi bi-bell-fill me-2"></i>Thông báo gần đây</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <small>Yêu cầu xem nhà mới</small>
+                                <span class="badge bg-danger rounded-pill">3</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <small>Tin nhắn từ khách hàng</small>
+                                <span class="badge bg-warning rounded-pill">5</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <small>BĐS cần duyệt</small>
+                                <span class="badge bg-info rounded-pill">2</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Hiển thị gợi ý cho User -->
+                <div class="card mt-4 fade-in user-only">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0 fs-6"><i class="bi bi-lightbulb-fill me-2"></i>Gợi ý cho bạn</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item small">
+                                <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                Cập nhật thông tin cá nhân để nhận thông báo phù hợp
+                            </li>
+                            <li class="list-group-item small">
+                                <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                Lưu các BĐS yêu thích để theo dõi biến động giá
+                            </li>
+                            <li class="list-group-item small">
+                                <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                Đặt lịch hẹn với nhân viên môi giới để xem nhà
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <!-- Profile Tab -->
+                    <div class="tab-pane fade show active" id="profile">
+                        <div class="card fade-in">
+                            <div class="card-header">
+                                <h5 class="section-title mb-0">Thông tin cá nhân</h5>
+                            </div>
+                            <div class="card-body">
+                                
+                                
+
+                                <form id="profileForm">
+                                    <div class="alert alert-info mb-4">
+                                        Thông tin của bạn sẽ được hiển thị cho khách hàng khi họ xem BĐS do bạn đăng.
+                                        Hãy đảm bảo thông tin liên hệ chính xác để không bỏ lỡ cơ hội giao dịch.
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="firstName" class="form-label">Họ</label>
+                                            <input type="text" class="form-control" id="firstName" required>
+                                            <div class="invalid-feedback">Vui lòng nhập họ.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="lastName" class="form-label">Tên</label>
+                                            <input type="text" class="form-control" id="lastName" required>
+                                            <div class="invalid-feedback">Vui lòng nhập tên.</div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" required readonly>
+                                        <div class="invalid-feedback">Vui lòng nhập email hợp lệ.</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="phone" class="form-label">Số điện thoại</label>
+                                            <input type="tel" class="form-control" id="phone" required>
+                                            <div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="birthDate" class="form-label">Ngày sinh</label>
+                                            <input type="date" class="form-control" id="birthDate">
+                                            <div class="invalid-feedback">Vui lòng chọn ngày sinh hợp lệ.</div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="address" class="form-label">Địa chỉ</label>
+                                        <textarea class="form-control" id="address" rows="4" required></textarea>
+                                        <div class="invalid-feedback">Vui lòng nhập địa chỉ.</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Cập nhật thông tin</button>
+                                </form>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div class="tab-pane fade" id="security">
+                        <div class="card fade-in">
+                            <div class="card-header">
+                                <h5 class="section-title mb-0">Bảo mật</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="securityForm" novalidate>
+                                    <div class="mb-3">
+                                        <label class="form-label">Mật khẩu hiện tại</label>
+                                        <input type="password" class="form-control" id="currentPassword" required aria-describedby="currentPasswordFeedback">
+                                        <div id="currentPasswordFeedback" class="invalid-feedback">Vui lòng nhập mật khẩu hiện tại.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Mật khẩu mới</label>
+                                        <input type="password" class="form-control" id="newPassword" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" aria-describedby="newPasswordFeedback">
+                                        <div id="newPasswordFeedback" class="invalid-feedback">Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Xác nhận mật khẩu mới</label>
+                                        <input type="password" class="form-control" id="confirmPassword" required aria-describedby="confirmPasswordFeedback">
+                                        <div id="confirmPasswordFeedback" class="invalid-feedback">Mật khẩu xác nhận không khớp.</div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary" id="securitySubmit">
+                                            <span id="securitySubmitText"><i class="bi bi-lock me-2"></i>Đổi mật khẩu</span>
+                                            <span id="securityLoadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Properties Tab (for REALTOR) -->
+                    <div class="tab-pane fade realtor-only" id="properties" role="tabpanel" aria-labelledby="propertiesTab">
+                        <div class="card fade-in">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="section-title mb-0">Quản lý bất động sản</h5>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPropertyModal">
+                                    <i class="bi bi-plus-circle me-1"></i> Thêm mới
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Mã BĐS</th>
+                                                <th>Ảnh</th>
+                                                <th>Tên</th>
+                                                <th>Loại</th>
+                                                <th>Giá</th>
+                                                <th>Trạng thái</th>
+                                                <th>Hành động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="propertiesTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transactions Tab -->
+                    <div class="tab-pane fade" id="transactions">
+                        <div class="card fade-in">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="section-title mb-0">Lịch sử giao dịch</h5>
+                                <!-- Nút cho USER -->
+                                <a href="/transactions/my-requests" class="btn btn-primary btn-sm user-only">
+                                    <i class="bi bi-card-list me-1"></i> Xem tất cả yêu cầu
+                                </a>
+                                <!-- Nút cho REALTOR -->
+                                <a href="/transactions/realtor-requests" class="btn btn-primary btn-sm realtor-only">
+                                    <i class="bi bi-card-list me-1"></i> Xem tất cả yêu cầu
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <!-- Thông tin dành cho realtor -->
+                                <div class="alert alert-info mb-3 realtor-only">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Lưu ý:</strong> Đang hiển thị các yêu cầu giao dịch liên quan đến bất động sản do bạn phụ trách. Bạn sẽ tự động được chỉ định làm người môi giới cho các giao dịch này.
+                                </div>
+
+                                <!-- User's own transactions/requests -->
+                                <div class="user-or-non-realtor-specific-transactions" th:if="${#authorization.expression('hasRole(''USER'')')}">
+                                    <h6 class="mb-3">Yêu cầu của bạn</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mã yêu cầu</th>
+                                                    <th>Bất động sản</th>
+                                                    <th>Loại GD</th>
+                                                    <th>Giá / Giá thuê</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Ngày tạo</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="transactionsTableBody">
+                                                <!-- User's transaction requests will be loaded here by loadTransactions() -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Realtor's assigned transaction requests -->
+                                <div class="realtor-only mt-4" id="realtorTransactionRequestsTableContainer" style="display: none;">
+                                    <h6 class="mb-3">Yêu cầu giao dịch được gán cho bạn</h6>
+                                    <div id="noRealtorRequests" style="display: none;" class="alert alert-info">Không có yêu cầu nào.</div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mã YC</th>
+                                                    <th>BĐS</th>
+                                                    <th>Loại YC</th> 
+                                                    <th>Khách hàng</th>
+                                                    <th>Ngày YC</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Hành động</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="realtorTransactionRequestsTableBody">
+                                                <!-- Realtor's transaction requests will be loaded here by loadRealtorTransactionRequests() -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Favorites Tab -->
+                    <div class="tab-pane fade" id="favorites">
+                        <div class="card fade-in">
+                            <div class="card-header">
+                                <h5 class="section-title mb-0">Bất động sản yêu thích</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Thống kê dành cho REALTOR -->
+                                <div class="realtor-only mb-4">
+                                    <div class="alert alert-success">
+                                        <h6 class="fw-bold"><i class="bi bi-graph-up me-2"></i>Thống kê lượt yêu thích</h6>
+                                        <p class="mb-0 small">Thống kê số lượt yêu thích các bất động sản do bạn đăng.</p>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h3 class="text-primary">124</h3>
+                                                    <p class="mb-0 text-muted small">Tổng lượt yêu thích</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h3 class="text-success">+12%</h3>
+                                                    <p class="mb-0 text-muted small">Tăng trưởng tháng này</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h3 class="text-info">8</h3>
+                                                    <p class="mb-0 text-muted small">BĐS có lượt yêu thích</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="my-4">
+                                </div>
+                                
+                                <!-- Danh sách BĐS yêu thích (cho cả USER và REALTOR) -->
+                                <div class="row" id="favoritesContainer"></div>
+                                
+                                <!-- Gợi ý cho USER -->
+                                <div class="user-only mt-4">
+                                    <div class="alert alert-info">
+                                        <h6 class="fw-bold"><i class="bi bi-lightbulb me-2"></i>Gợi ý cho bạn</h6>
+                                        <p class="mb-0 small">Dựa trên danh sách yêu thích của bạn, bạn có thể quan tâm đến:</p>
+                                    </div>
+                                    <div class="row" id="recommendationsContainer">
+                                        <!-- Placeholder cho các BĐS được gợi ý -->
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card property-card">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">Đang tải gợi ý...</h6>
+                                                    <p class="card-text placeholder-glow">
+                                                        <span class="placeholder col-7"></span>
+                                                        <span class="placeholder col-4"></span>
+                                                        <span class="placeholder col-4"></span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Tab -->
+                    <div class="tab-pane fade" id="notifications">
+                        <div class="card fade-in">
+                            <div class="card-header">
+                                <h5 class="section-title mb-0">Cài đặt thông báo</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="notificationsForm" novalidate>
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                            <label class="form-check-label" for="emailNotifications">Thông báo qua email</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="smsNotifications">
+                                            <label class="form-check-label" for="smsNotifications">Thông báo qua SMS</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="priceAlerts" checked>
+                                            <label class="form-check-label" for="priceAlerts">Cảnh báo giá</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="newListings" checked>
+                                            <label class="form-check-label" for="newListings">Bất động sản mới</label>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary" id="notificationsSubmit">
+                                            <span id="notificationsSubmitText"><i class="bi bi-save me-2"></i>Lưu cài đặt</span>
+                                            <span id="notificationsLoadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Change Avatar Modal -->
+    <div class="modal fade" id="changeAvatarModal" tabindex="-1" aria-labelledby="changeAvatarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changeAvatarModalLabel">Đổi ảnh đại diện</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="avatarForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Chọn ảnh (tối đa 2MB)</label>
+                            <input type="file" class="form-control" id="avatarInput" accept="image/*" required aria-describedby="avatarInputFeedback">
+                            <div id="avatarInputFeedback" class="invalid-feedback">Vui lòng chọn một file ảnh hợp lệ.</div>
+                        </div>
+                        <div class="text-center">
+                            <img id="avatarPreview" src="../assets/images/avatar-default.jpg" alt="Avatar Preview" class="rounded-circle mb-3" width="150">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="saveAvatar">
+                        <span id="avatarSubmitText"><i class="bi bi-save me-2"></i>Lưu</span>
+                        <span id="avatarLoadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Property Modal -->
+    <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPropertyModalLabel">Thêm bất động sản mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="propertyForm" novalidate>
+                        <input type="hidden" id="propertyId">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tên bất động sản</label>
+                                <input type="text" class="form-control" id="propertyName" required minlength="3" maxlength="100">
+                                <div class="invalid-feedback">Tên bất động sản phải từ 3 đến 100 ký tự.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Loại bất động sản</label>
+                                <select class="form-select" id="propertyType" required>
+                                    <option value="">Chọn loại...</option>
+                                    <!-- Options sẽ được load bằng JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Giá (VNĐ)</label>
+                                <input type="number" class="form-control" id="propertyPrice" step="any" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Diện tích (m²)</label>
+                                <input type="number" class="form-control" id="propertyArea" step="any" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Số phòng ngủ</label>
+                                <input type="number" class="form-control" id="propertyBedrooms">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Số phòng tắm</label>
+                                <input type="number" class="form-control" id="propertyBathrooms">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Năm xây dựng</label>
+                                <input type="number" class="form-control" id="propertyYearBuilt">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <textarea class="form-control" id="propertyAddress" rows="2" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="propertyDescription" rows="3"></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select" id="propertyStatus" required>
+                                    <option value="AVAILABLE">Có sẵn</option>
+                                    <option value="PENDING">Đang chờ duyệt</option>
+                                    <option value="SOLD">Đã bán</option>
+                                    <option value="RENTED">Đã cho thuê</option>
+                                    <option value="UNAVAILABLE">Không có sẵn</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Loại giao dịch</label>
+                                <select class="form-select" id="propertyTransactionType" required>
+                                    <option value="SALE">Bán</option>
+                                    <option value="RENTAL">Cho thuê</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hình ảnh (có thể chọn nhiều ảnh)</label>
+                            <input type="file" class="form-control" id="propertyImages" multiple accept="image/*">
+                            <small class="form-text text-muted">Hình ảnh đầu tiên sẽ được dùng làm ảnh đại diện.</small>
+                        </div>
+                        <div id="existingImagesContainer" class="mb-3">
+                            <!-- Existing images will be shown here when editing -->
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="saveProperty">
+                        <i class="bi bi-save me-2"></i>Lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="toast-header">
+            <strong class="me-auto">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="footer :: footer"></div>
+
+    <!-- Bootstrap and other scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/account.js"></script>
+    
+    <!-- Define redirectToAccount function for header links -->
+    <script>
+        // Define the redirectToAccount function needed by header.html
+        function redirectToAccount() {
+            // Since we're already on the account page, we can just refresh or do nothing
+            // We could also check if we need to redirect to a specific tab
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+            }
+            // Otherwise we're already on the account page with a token, so do nothing
+        }
+    </script>
+</body>
+</html>

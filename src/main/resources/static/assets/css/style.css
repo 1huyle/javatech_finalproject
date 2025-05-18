@@ -1,0 +1,165 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    line-height: 1.6;
+    background-color: #f4f4f4; /* Màu nền nhẹ cho toàn bộ trang */
+}
+
+/* Biến màu sắc */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #333;
+    --light-gray: #ddd;
+    --dark-gray: #333;
+    --white: #fff;
+}
+
+/* Property Cards */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.card-text {
+    font-size: 0.9rem;
+}
+
+.text-primary {
+    color: #3b82f6 !important;
+    font-weight: 600;
+}
+
+.btn-outline-primary {
+    color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.btn-outline-primary:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--light-gray);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    padding: 2rem 0;
+    margin-top: 2rem;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 180px;
+    }
+    
+    .btn {
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+/* Additional styles */
+.hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://luathongbang.com.vn/wp-content/uploads/2022/06/kinh-doanh-bat-dong-san.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 20rem 0;
+    color: white;
+}
+
+.section-bg {
+    background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('../assets/images/section-bg.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.carousel-item img {
+    height: 550px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.similar-property img {
+    height: 200px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.similar-property:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.map-container {
+    width: 100%;
+    height: 450px;
+}
+
+@media (max-width: 768px) {
+    .carousel-item img,
+    .similar-property img {
+        height: 180px;
+    }
+    .map-container {
+        height: 600px;
+    }
+}

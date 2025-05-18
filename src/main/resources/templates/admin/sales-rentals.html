@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý giao dịch mua bán và cho thuê bất động sản dành cho admin">
+    <title>Quản lý giao dịch cho thuê - Admin</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link href="/assets/css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+        
+              <!-- Sidebar -->
+              <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <img src="/assets/images/logo.png" alt="Logo quản trị hệ thống" height="40">
+                        <h5 class="text-white mt-2">Quản trị hệ thống</h5>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                Tổng quan
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/properties">
+                                <i class="bi bi-house me-2"></i>
+                                Quản lý bất động sản
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/orders">
+                                <i class="bi bi-cart me-2"></i>
+                                Quản lý giao dịch mua bán
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/sales-rentals">
+                                <i class="bi bi-key me-2"></i>
+                                Quản lý giao dịch cho thuê
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/payments">
+                                <i class="bi bi-credit-card me-2"></i>
+                                Quản lý thanh toán
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/users">
+                                <i class="bi bi-people me-2"></i>
+                                Quản lý người dùng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/realtors">
+                                <i class="bi bi-person-badge me-2"></i>
+                                Quản lý môi giới
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/setting">
+                                <i class="bi bi-gear me-2"></i>
+                                Cài đặt
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 col-lg-10 ms-sm-auto px-md-4">
+                <!-- Toggle Sidebar Button (Mobile) -->
+                <button class="btn btn-dark d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar" aria-expanded="false" aria-controls="sidebar">
+                    <i class="bi bi-list"></i> Menu
+                </button>
+                    <!-- Header -->
+                    <header class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Quản lý giao dịch cho thuê</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button class="btn btn-primary admin-only" data-bs-toggle="modal" data-bs-target="#addTransactionModal" aria-label="Thêm giao dịch">
+                                    <i class="bi bi-plus-circle me-2"></i> Thêm giao dịch
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" aria-label="Xuất báo cáo">
+                                    <i class="bi bi-file-earmark-arrow-down"></i> Xuất báo cáo
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" aria-label="In">
+                                    <i class="bi bi-printer"></i> In
+                                </button>
+                            </div>
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-calendar3"></i> Tuần này
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#">Hôm nay</a></li>
+                                    <li><a class="dropdown-item" href="#">Tuần này</a></li>
+                                    <li><a class="dropdown-item" href="#">Tháng này</a></li>
+                                    <li><a class="dropdown-item" href="#">Năm nay</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </header>
+
+                    
+
+                <!-- Filters -->
+                <section class="card mb-4">
+                    <div class="card-body">
+                        <form class="row g-3" id="filterForm">
+                            <div class="col-md-4">
+                                <label for="searchInput" class="form-label">Tìm kiếm</label>
+                                <input type="text" class="form-control" id="searchInput" placeholder="ID, bất động sản, người mua..." aria-describedby="searchInputHelp">
+                                <small id="searchInputHelp" class="form-text text-muted">Nhập ID giao dịch, tên bất động sản hoặc người mua</small>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="typeFilter" class="form-label">Loại giao dịch</label>
+                                <select class="form-select" id="typeFilter" aria-label="Lọc theo loại giao dịch">
+                                    <option value="">Tất cả</option>
+                                    <option value="sale">Mua bán</option>
+                                    <option value="rental">Cho thuê</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="statusFilter" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="statusFilter" aria-label="Lọc theo trạng thái">
+                                    <option value="">Tất cả</option>
+                                    <option value="completed">Hoàn thành</option>
+                                    <option value="processing">Đang xử lý</option>
+                                    <option value="cancelled">Đã hủy</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-center gap-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search me-2"></i> Lọc
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary" aria-label="Xóa bộ lọc">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Transactions Table -->
+                <section class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <label for="rowsPerPage" class="form-label me-2">Hiển thị:</label>
+                                <select id="rowsPerPage" class="form-select w-auto" aria-label="Số dòng mỗi trang">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" aria-label="Danh sách giao dịch mua thuê">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID <i class="bi bi-sort-alpha-down"></i></th>
+                                        <th scope="col">Bất động sản</th>
+                                        <th scope="col">Người mua/thuê</th>
+                                        <th scope="col">Loại</th>
+                                        <th scope="col">Giá</th>
+                                        <th scope="col">Trạng thái</th>
+                                        <th scope="col">Ngày</th>
+                                        <th scope="col">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>GD001</td>
+                                        <td>Căn hộ cao cấp Quận 1</td>
+                                        <td>Nguyễn Văn A</td>
+                                        <td>Mua bán</td>
+                                        <td>2.5 tỷ</td>
+                                        <td><span class="badge bg-success">Hoàn thành</span></td>
+                                        <td>15/05/2024</td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Thao tác với giao dịch">
+                                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#orderDetailsModal" aria-label="Xem chi tiết giao dịch">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-primary admin-only" data-bs-toggle="modal" data-bs-target="#editTransactionModal" aria-label="Chỉnh sửa giao dịch">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger admin-only" aria-label="Xóa giao dịch">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>GD002</td>
+                                        <td>Nhà phố Quận 2</td>
+                                        <td>Trần Thị B</td>
+                                        <td>Cho thuê</td>
+                                        <td>15 triệu/tháng</td>
+                                        <td><span class="badge bg-warning text-dark">Đang xử lý</span></td>
+                                        <td>14/05/2024</td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Thao tác với giao dịch">
+                                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#orderDetailsModal" aria-label="Xem chi tiết giao dịch">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-primary admin-only" data-bs-toggle="modal" data-bs-target="#editTransactionModal" aria-label="Chỉnh sửa giao dịch">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger admin-only" aria-label="Xóa giao dịch">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>GD003</td>
+                                        <td>Biệt thự Quận 7</td>
+                                        <td>Lê Văn C</td>
+                                        <td>Mua bán</td>
+                                        <td>5.2 tỷ</td>
+                                        <td><span class="badge bg-danger">Đã hủy</span></td>
+                                        <td>13/05/2024</td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Thao tác với giao dịch">
+                                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#orderDetailsModal" aria-label="Xem chi tiết giao dịch">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-primary admin-only" data-bs-toggle="modal" data-bs-target="#editTransactionModal" aria-label="Chỉnh sửa giao dịch">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger admin-only" aria-label="Xóa giao dịch">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Phân trang danh sách giao dịch" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
+                                </li>
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">2</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">3</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Sau</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Transaction Modal -->
+    <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTransactionModalLabel">Thêm giao dịch mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTransactionForm" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="propertyId" class="form-label">Bất động sản</label>
+                                <select class="form-select" id="propertyId" required>
+                                    <option value="" disabled selected>Chọn bất động sản</option>
+                                    <option value="P001">Căn hộ cao cấp Quận 1</option>
+                                    <option value="P002">Nhà phố Quận 2</option>
+                                    <option value="P003">Biệt thự Quận 7</option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn bất động sản.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="userId" class="form-label">Người mua/thuê</label>
+                                <select class="form-select" id="userId" required>
+                                    <option value="" disabled selected>Chọn người mua/thuê</option>
+                                    <option value="U001">Nguyễn Văn A</option>
+                                    <option value="U002">Trần Thị B</option>
+                                    <option value="U003">Lê Văn C</option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn người mua/thuê.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="transactionType" class="form-label">Loại giao dịch</label>
+                                <select class="form-select" id="transactionType" required>
+                                    <option value="" disabled selected>Chọn loại giao dịch</option>
+                                    <option value="sale">Mua bán</option>
+                                    <option value="rental">Cho thuê</option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn loại giao dịch.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="transactionPrice" class="form-label">Giá</label>
+                                <input type="number" class="form-control" id="transactionPrice" required min="0" step="1000000">
+                                <div class="invalid-feedback">Vui lòng nhập giá hợp lệ (lớn hơn hoặc bằng 0).</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="transactionStatus" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="transactionStatus" required>
+                                    <option value="" disabled selected>Chọn trạng thái</option>
+                                    <option value="completed">Hoàn thành</option>
+                                    <option value="processing">Đang xử lý</option>
+                                    <option value="cancelled">Đã hủy</option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn trạng thái.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="transactionDate" class="form-label">Ngày giao dịch</label>
+                                <input type="date" class="form-control" id="transactionDate" required>
+                                <div class="invalid-feedback">Vui lòng chọn ngày giao dịch.</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="validateAddTransactionForm()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Transaction Modal -->
+    <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTransactionModalLabel">Chỉnh sửa giao dịch</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTransactionForm" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editPropertyId" class="form-label">Bất động sản</label>
+                                <select class="form-select" id="editPropertyId" required>
+                                    <option value="P001" selected>Căn hộ cao cấp Quận 1</option>
+                                    <option value="P002">Nhà phố Quận 2</option>
+                                    <option value="P003">Biệt thự Quận 7</option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn bất động sản.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editUserId" class="form-label">Người mua/thuê</label>
+                                <select class="form-select" id="editUserId" required>
+                                    <option value="U001" selected>Nguyễn Văn A</option>
+                                    <option value="U002">Trần Thị B</option>
+                                    <option value="U003">Lê Văn C</option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn người mua/thuê.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editTransactionType" class="form-label">Loại giao dịch</label>
+                                <select class="form-select" id="editTransactionType" required>
+                                    <option value="sale" selected>Mua bán</option>
+                                    <option value="rental">Cho thuê</option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn loại giao dịch.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editTransactionPrice" class="form-label">Giá</label>
+                                <input type="number" class="form-control" id="editTransactionPrice" value="2500000000" required min="0" step="1000000">
+                                <div class="invalid-feedback">Vui lòng nhập giá hợp lệ (lớn hơn hoặc bằng 0).</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editTransactionStatus" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="editTransactionStatus" required>
+                                    <option value="completed" selected>Hoàn thành</option>
+                                    <option value="processing">Đang xử lý</option>
+                                    <option value="cancelled">Đã hủy</option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn trạng thái.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editTransactionDate" class="form-label">Ngày giao dịch</label>
+                                <input type="date" class="form-control" id="editTransactionDate" value="2024-05-15" required>
+                                <div class="invalid-feedback">Vui lòng chọn ngày giao dịch.</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="validateEditTransactionForm()">Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel">Chi tiết giao dịch #GD001</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Thông tin khách hàng</h6>
+                            <p><strong>Họ và tên:</strong> Nguyễn Văn A</p>
+                            <p><strong>Email:</strong> nguyenvana@example.com</p>
+                            <p><strong>Số điện thoại:</strong> 0123456789</p>
+                            <p><strong>Địa chỉ:</strong> 123 Đường ABC, Quận 1, TP.HCM</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Thông tin giao dịch</h6>
+                            <p><strong>Mã giao dịch:</strong> #GD001</p>
+                            <p><strong>Ngày tạo:</strong> 15/05/2024</p>
+                            <p><strong>Trạng thái:</strong> <span class="badge bg-success">Hoàn thành</span></p>
+                            <p><strong>Phương thức thanh toán:</strong> Chuyển khoản ngân hàng</p>
+                        </div>
+                    </div>
+
+                    <h6 class="mb-3">Thông tin bất động sản</h6>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="../../assets/images/property1.jpg" alt="Căn hộ cao cấp Quận 1" class="img-fluid rounded">
+                                </div>
+                                <div class="col-md-9">
+                                    <h5>Căn hộ cao cấp Quận 1</h5>
+                                    <p><strong>Mã bất động sản:</strong> #P001</p>
+                                    <p><strong>Địa chỉ:</strong> 123 Đường ABC, Quận 1, TP.HCM</p>
+                                    <p><strong>Diện tích:</strong> 100m²</p>
+                                    <p><strong>Giá:</strong> 2.500.000.000 VNĐ</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mb-3">Lịch sử giao dịch</h6>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">15/05/2024 10:30</div>
+                            <div class="timeline-content">
+                                <h6>Giao dịch hoàn thành</h6>
+                                <p>Giao dịch đã được hoàn thành thành công.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">14/05/2024 15:45</div>
+                            <div class="timeline-content">
+                                <h6>Thanh toán xác nhận</h6>
+                                <p>Khách hàng đã thanh toán đầy đủ số tiền 2.500.000.000 VNĐ.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">14/05/2024 09:15</div>
+                            <div class="timeline-content">
+                                <h6>Giao dịch đang xử lý</h6>
+                                <p>Giao dịch đang được xử lý bởi nhân viên.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">13/05/2024 14:20</div>
+                            <div class="timeline-content">
+                                <h6>Giao dịch đã xác nhận</h6>
+                                <p>Giao dịch đã được xác nhận bởi admin.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">13/05/2024 11:30</div>
+                            <div class="timeline-content">
+                                <h6>Giao dịch được tạo</h6>
+                                <p>Khách hàng đã tạo giao dịch mới.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" aria-label="In chi tiết giao dịch">
+                        <i class="bi bi-printer"></i> In chi tiết
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer bg-light py-3">
+        <div class="container text-center">
+            <span>© 2025 Hệ thống quản lý bất động sản. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="../../assets/js/admin.js"></script>
+</body>
+</html>

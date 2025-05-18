@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yêu cầu giao dịch của tôi - Bất Động Sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <style>
+        .request-card {
+            transition: transform 0.3s ease;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .request-card:hover {
+            transform: translateY(-5px);
+        }
+        .status-pending {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .status-approved {
+            background-color: #10b981;
+            color: white;
+        }
+        .status-rejected {
+            background-color: #ef4444;
+            color: white;
+        }
+        .status-completed {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="container py-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="mb-4 section-title">Yêu cầu giao dịch của tôi</h1>
+                
+                <!-- Thông báo -->
+                <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <!--loại yêu cầu -->
+                <ul class="nav nav-tabs mb-4" id="requestsTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">
+                            Tất cả
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="purchase-tab" data-bs-toggle="tab" data-bs-target="#purchase" type="button" role="tab" aria-controls="purchase" aria-selected="false">
+                            Mua bán
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="lease-tab" data-bs-toggle="tab" data-bs-target="#lease" type="button" role="tab" aria-controls="lease" aria-selected="false">
+                            Thuê
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="requestsTabContent">
+                    <!-- Tab Tất cả -->
+                    <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+                        <div class="row" th:if="${!requests.isEmpty()}">
+                            <div class="col-md-4 mb-4" th:each="request : ${requests}">
+                                <div class="card request-card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0" th:text="${#strings.contains(request.class.name, 'PurchaseRequest') ? 'Yêu cầu mua' : 'Yêu cầu thuê'}">Yêu cầu</h5>
+                                        <span th:class="'badge status-' + ${#strings.toLowerCase(request.status)}" th:text="${request.status.displayName}">Trạng thái</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2"><strong>Mã yêu cầu:</strong> <span th:text="${request.id}">12345</span></p>
+                                        <p class="mb-2"><strong>Bất động sản:</strong> <span th:text="${request.property.name}">Tên bất động sản</span></p>
+                                        <p class="mb-2"><strong>Địa chỉ:</strong> <span th:text="${request.property.address}">Địa chỉ</span></p>
+                                        <p class="mb-2"><strong>Ngày yêu cầu:</strong> <span th:text="${#temporals.format(request.createdAt, 'dd/MM/yyyy')}">01/01/2023</span></p>
+                                        <p class="mb-2"><strong>Ngày dự kiến:</strong> <span th:text="${#temporals.format(request.expectedDate, 'dd/MM/yyyy')}">15/01/2023</span></p>
+                                        
+                                        <!-- Thông tin riêng cho yêu cầu mua -->
+                                        <div th:if="${#strings.contains(request.class.name, 'PurchaseRequest')}">
+                                            <p class="mb-2"><strong>Giá mua:</strong> <span th:text="${#numbers.formatDecimal(request.purchasePrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">1.000.000.000 VNĐ</span></p>
+                                            <p class="mb-2"><strong>Phương thức:</strong> <span th:text="${request.paymentMethod.getDisplayName()}">Tiền mặt</span></p>
+                                        </div>
+                                        
+                                        <!-- Thông tin riêng cho yêu cầu thuê -->
+                                        <div th:if="${#strings.contains(request.class.name, 'LeaseRequest')}">
+                                            <p class="mb-2"><strong>Giá thuê:</strong> <span th:text="${#numbers.formatDecimal(request.monthlyRent, 0, 'COMMA', 0, 'POINT') + ' VNĐ/tháng'}">5.000.000 VNĐ/tháng</span></p>
+                                            <p class="mb-2"><strong>Thời hạn:</strong> <span th:text="${#temporals.format(request.startDate, 'dd/MM/yyyy') + ' đến ' + #temporals.format(request.endDate, 'dd/MM/yyyy')}">01/02/2023 đến 01/02/2024</span></p>
+                                        </div>
+                                        
+                                        <!-- Ghi chú -->
+                                        <div class="mt-3" th:if="${request.note != null && !request.note.isEmpty()}">
+                                            <p class="mb-1"><strong>Ghi chú:</strong></p>
+                                            <p class="text-muted" th:text="${request.note}">Ghi chú của bạn</p>
+                                        </div>
+                                        
+                                        <!-- Ghi chú của admin -->
+                                        <div class="mt-3" th:if="${request.adminNote != null && !request.adminNote.isEmpty()}">
+                                            <p class="mb-1"><strong>Phản hồi:</strong></p>
+                                            <p class="fst-italic" th:text="${request.adminNote}">Phản hồi từ người quản lý</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a th:href="@{'/transactions/' + ${request.id}}" class="btn btn-primary w-100">Xem chi tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info" th:if="${requests.isEmpty()}">
+                            <i class="bi bi-info-circle me-2"></i> Bạn chưa có yêu cầu giao dịch nào.
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Mua bán -->
+                    <div class="tab-pane fade" id="purchase" role="tabpanel" aria-labelledby="purchase-tab">
+                        <div class="row" th:if="${!purchaseRequests.isEmpty()}">
+                            <div class="col-md-4 mb-4" th:each="request : ${purchaseRequests}">
+                                <!-- Tương tự như trên, chỉ hiển thị yêu cầu mua -->
+                                <div class="card request-card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Yêu cầu mua</h5>
+                                        <span th:class="'badge status-' + ${#strings.toLowerCase(request.status)}" th:text="${request.status.displayName}">Trạng thái</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Chi tiết yêu cầu mua -->
+                                        <p class="mb-2"><strong>Mã yêu cầu:</strong> <span th:text="${request.id}">12345</span></p>
+                                        <p class="mb-2"><strong>Bất động sản:</strong> <span th:text="${request.property.name}">Tên bất động sản</span></p>
+                                        <p class="mb-2"><strong>Địa chỉ:</strong> <span th:text="${request.property.address}">Địa chỉ</span></p>
+                                        <p class="mb-2"><strong>Ngày yêu cầu:</strong> <span th:text="${#temporals.format(request.createdAt, 'dd/MM/yyyy')}">01/01/2023</span></p>
+                                        <p class="mb-2"><strong>Ngày dự kiến:</strong> <span th:text="${#temporals.format(request.expectedDate, 'dd/MM/yyyy')}">15/01/2023</span></p>
+                                        <p class="mb-2"><strong>Giá mua:</strong> <span th:text="${#numbers.formatDecimal(request.purchasePrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">1.000.000.000 VNĐ</span></p>
+                                        <p class="mb-2"><strong>Phương thức:</strong> <span th:text="${request.paymentMethod.getDisplayName()}">Tiền mặt</span></p>
+                                        
+                                        <!-- Ghi chú -->
+                                        <div class="mt-3" th:if="${request.note != null && !request.note.isEmpty()}">
+                                            <p class="mb-1"><strong>Ghi chú:</strong></p>
+                                            <p class="text-muted" th:text="${request.note}">Ghi chú của bạn</p>
+                                        </div>
+                                        
+                                        <!-- Ghi chú của admin -->
+                                        <div class="mt-3" th:if="${request.adminNote != null && !request.adminNote.isEmpty()}">
+                                            <p class="mb-1"><strong>Phản hồi:</strong></p>
+                                            <p class="fst-italic" th:text="${request.adminNote}">Phản hồi từ người quản lý</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a th:href="@{'/transactions/' + ${request.id}}" class="btn btn-primary w-100">Xem chi tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info" th:if="${purchaseRequests.isEmpty()}">
+                            <i class="bi bi-info-circle me-2"></i> Bạn chưa có yêu cầu mua bất động sản nào.
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Thuê -->
+                    <div class="tab-pane fade" id="lease" role="tabpanel" aria-labelledby="lease-tab">
+                        <div class="row" th:if="${!leaseRequests.isEmpty()}">
+                            <div class="col-md-4 mb-4" th:each="request : ${leaseRequests}">
+                                <!-- hiển thị yêu cầu thuê -->
+                                <div class="card request-card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Yêu cầu thuê</h5>
+                                        <span th:class="'badge status-' + ${#strings.toLowerCase(request.status)}" th:text="${request.status.displayName}">Trạng thái</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Chi tiết yêu cầu thuê -->
+                                        <p class="mb-2"><strong>Mã yêu cầu:</strong> <span th:text="${request.id}">12345</span></p>
+                                        <p class="mb-2"><strong>Bất động sản:</strong> <span th:text="${request.property.name}">Tên bất động sản</span></p>
+                                        <p class="mb-2"><strong>Địa chỉ:</strong> <span th:text="${request.property.address}">Địa chỉ</span></p>
+                                        <p class="mb-2"><strong>Ngày yêu cầu:</strong> <span th:text="${#temporals.format(request.createdAt, 'dd/MM/yyyy')}">01/01/2023</span></p>
+                                        <p class="mb-2"><strong>Ngày dự kiến:</strong> <span th:text="${#temporals.format(request.expectedDate, 'dd/MM/yyyy')}">15/01/2023</span></p>
+                                        <p class="mb-2"><strong>Giá thuê:</strong> <span th:text="${#numbers.formatDecimal(request.monthlyRent, 0, 'COMMA', 0, 'POINT') + ' VNĐ/tháng'}">5.000.000 VNĐ/tháng</span></p>
+                                        <p class="mb-2"><strong>Thời hạn:</strong> <span th:text="${#temporals.format(request.startDate, 'dd/MM/yyyy') + ' đến ' + #temporals.format(request.endDate, 'dd/MM/yyyy')}">01/02/2023 đến 01/02/2024</span></p>
+                                        
+                                        <!-- Ghi chú -->
+                                        <div class="mt-3" th:if="${request.note != null && !request.note.isEmpty()}">
+                                            <p class="mb-1"><strong>Ghi chú:</strong></p>
+                                            <p class="text-muted" th:text="${request.note}">Ghi chú của bạn</p>
+                                        </div>
+                                        
+                                        <!-- Ghi chú của admin -->
+                                        <div class="mt-3" th:if="${request.adminNote != null && !request.adminNote.isEmpty()}">
+                                            <p class="mb-1"><strong>Phản hồi:</strong></p>
+                                            <p class="fst-italic" th:text="${request.adminNote}">Phản hồi từ người quản lý</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a th:href="@{'/transactions/' + ${request.id}}" class="btn btn-primary w-100">Xem chi tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info" th:if="${leaseRequests.isEmpty()}">
+                            <i class="bi bi-info-circle me-2"></i> Bạn chưa có yêu cầu thuê bất động sản nào.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+</body>
+</html> 

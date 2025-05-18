@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thông báo: Bất động sản đã được kích hoạt lại</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <p th:text="'Kính gửi ' + ${realtorName} + ','"></p>
+    
+    <p>
+        Bất động sản <strong th:text="${propertyName}"></strong> (ID: <span th:text="${propertyId}"></span>) 
+        của bạn đã được kích hoạt lại bởi quản trị viên.
+    </p>
+    
+    <p>
+        <strong>Địa chỉ:</strong> <span th:text="${propertyAddress}"></span>
+    </p>
+    
+    <p>
+        Bất động sản này đã được chuyển sang trạng thái <strong>AVAILABLE</strong> và hiện đang được hiển thị trên hệ thống.
+    </p>
+    
+    <p>
+        Bạn có thể xem thông tin tài khoản và bất động sản của mình tại: <a th:href="${accountUrl}" th:text="${accountUrl}"></a>
+    </p>
+    
+    <p>Trân trọng,<br />Hệ thống Real Estate</p>
+</body>
+</html> 

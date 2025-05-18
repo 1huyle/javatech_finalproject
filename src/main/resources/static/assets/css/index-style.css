@@ -1,0 +1,157 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+}
+.hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://luathongbang.com.vn/wp-content/uploads/2022/06/kinh-doanh-bat-dong-san.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 6rem 0;
+    color: white;
+    position: relative;
+}
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.search-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+.category-icon {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.category-icon:hover {
+    transform: translateY(-5px);
+    color: #facc15;
+}
+.property-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.property-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.property-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    aspect-ratio: 4 / 3;
+    display: block;
+}
+.avatar-container img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    display: block;
+}
+.favorite-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    aspect-ratio: 4 / 3;
+    display: block;
+}
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 2rem;
+}
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 50%;
+    height: 4px;
+    background: #facc15;
+    border-radius: 2px;
+}
+.cta-button {
+    background: #facc15;
+    color: #1e3a8a;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+}
+.cta-button:hover {
+    background: #eab308;
+    transform: scale(1.05);
+}
+.stats-section {
+    background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+    color: white;
+    padding: 3rem 0;
+    border-radius: 12px;
+}
+.stats-item {
+    text-align: center;
+}
+.stats-item h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+.map-container {
+    height: 400px;
+}
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .section-title {
+        font-size: 2rem;
+    }
+    .stats-item h3 {
+        font-size: 2rem;
+    }
+    .map-container {
+        height: 300px;
+    }
+    .property-card img {
+        height: 150px;
+    }
+    .favorite-card img {
+        height: 140px;
+    }
+    .avatar-container img {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+/* CSS cho nút yêu thích */
+.add-to-wishlist.active {
+    background-color: #fdf2f2;
+    border-color: #e11d48;
+}
+
+.add-to-wishlist.active i {
+    color: #e11d48;
+}
+
+.add-to-wishlist:focus {
+    box-shadow: none;
+}
+
+/* Animation khi thêm vào yêu thích */
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.add-to-wishlist.active i {
+    animation: heartbeat 0.5s ease-in-out;
+}

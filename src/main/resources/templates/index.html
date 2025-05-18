@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tìm kiếm bất động sản nhanh chóng tại Việt Nam với nền tảng hàng đầu. Mua bán, cho thuê căn hộ, nhà phố, biệt thự, đất nền và hơn thế nữa.">
+    <meta name="keywords" content="bất động sản, mua bán nhà đất, cho thuê bất động sản, căn hộ, biệt thự, đất nền, Việt Nam">
+    <meta name="author" content="Bất Động Sản">
+    <title>Trang chủ - Bất Động Sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <link href="/assets/css/index-style.css" rel="stylesheet">
+    <link href="/assets/css/header.css" rel="stylesheet">
+
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{header :: header}"></div>
+
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="hero-title">
+        <div class="container text-center">
+            <h1 id="hero-title" class="mb-4">TÌM KIẾM BẤT ĐỘNG SẢN NHANH CHÓNG & DỄ DÀNG</h1>
+            <p class="lead mb-5">Khám phá các cơ hội bất động sản tốt nhất tại Việt Nam với dịch vụ chuyên nghiệp của chúng tôi.</p>
+            <div class="search-container mx-auto">
+                <div class="row g-3 mb-4 align-items-center">
+                    <div class="col-md-4">
+                        <select class="form-select form-select-lg" aria-label="Loại bất động sản">
+                            <option value="">Loại bất động sản</option>
+                            <option value="apartment">Căn hộ</option>
+                            <option value="house">Nhà phố</option>
+                            <option value="villa">Biệt thự</option>
+                            <option value="land">Đất nền</option>
+                            <option value="condominium">Chung cư</option>
+                            <option value="office">Văn phòng</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control form-control-lg" placeholder="Nhập địa điểm hoặc khu vực" aria-label="Địa điểm">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary btn-lg w-100 cta-button" aria-label="Tìm kiếm bất động sản">
+                            <i class="fas fa-search me-2"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center gap-4">
+                    <a href="/apartments" class="category-icon d-flex flex-column align-items-center text-dark text-decoration-none">
+                        <i class="fas fa-building fs-3 mb-2"></i>
+                        <span>Căn hộ</span>
+                    </a>
+                    <a href="/villas" class="category-icon d-flex flex-column align-items-center text-dark text-decoration-none">
+                        <i class="fas fa-home fs-3 mb-2"></i>
+                        <span>Biệt thự</span>
+                    </a>
+                    <a href="/condominiums" class="category-icon d-flex flex-column align-items-center text-dark text-decoration-none">
+                        <i class="fas fa-city fs-3 mb-2"></i>
+                        <span>Chung cư</span>
+                    </a>
+                    <a href="/townhouses" class="category-icon d-flex flex-column align-items-center text-dark text-decoration-none">
+                        <i class="fas fa-store fs-3 mb-2"></i>
+                        <span>Nhà phố</span>
+                    </a>
+                    <a href="/offices" class="category-icon d-flex flex-column align-items-center text-dark text-decoration-none">
+                        <i class="fas fa-briefcase fs-3 mb-2"></i>
+                        <span>Văn phòng</span>
+                    </a>
+                    <a href="/land" class="category-icon d-flex flex-column align-items-center text-dark text-decoration-none">
+                        <i class="fas fa-tree fs-3 mb-2"></i>
+                        <span>Đất nền</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section mb-5">
+        <div class="container">
+            <div class="row g-0">
+                <div class="col-md-3 stats-item">
+                    <h3>10+</h3>
+                    <p>Năm kinh nghiệm</p>
+                </div>
+                <div class="col-md-3 stats-item">
+                    <h3>5,000+</h3>
+                    <p>Khách hàng hài lòng</p>
+                </div>
+                <div class="col-md-3 stats-item">
+                    <h3>1,000+</h3>
+                    <p>Dự án thành công</p>
+                </div>
+                <div class="col-md-3 stats-item">
+                    <h3>50+</h3>
+                    <p>Đối tác chiến lược</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Properties -->
+    <section class="py-5" aria-labelledby="featured-properties-title">
+        <div class="container">
+            <h2 id="featured-properties-title" class="section-title text-center">Bất động sản nổi bật</h2>
+            <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="row">
+                            <!-- Dùng dữ liệu từ server -->
+                            <div th:each="property, propertyStat : ${featuredProperties}" th:if="${propertyStat.index < 3}" class="col-md-4 mb-4">
+                                <div class="card property-card">
+                                    <div class="position-relative">
+                                        <img th:src="${property.fileUrl != null ? property.fileUrl : '/assets/images/property-default.jpg'}" class="card-img-top" th:alt="${property.name}">
+                                        <span th:if="${property.status.name() == 'NEW'}" class="position-absolute top-0 end-0 m-2 badge bg-danger">Mới</span>
+                                        <span th:if="${property.status.name() == 'PRICE_REDUCED'}" class="position-absolute top-0 end-0 m-2 badge bg-success">Giảm giá</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title" th:text="${property.name}">Tên bất động sản</h5>
+                                        <p class="card-text text-success fw-bold" th:text="${#numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">Giá</p>
+                                        <p class="card-text">
+                                            <i class="fas fa-map-marker-alt me-1"></i> <span th:text="${property.address}">Địa chỉ</span><br>
+                                            <i class="fas fa-ruler-combined me-1"></i> <span th:text="${property.area + ' m²'}">Diện tích</span><br>
+                                            <i class="fas fa-door-open me-1"></i> <span>Phòng ngủ</span>
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a th:href="@{'/property/' + ${property.id}}" class="btn btn-primary">Xem chi tiết</a>
+                                            <button class="btn btn-outline-danger add-to-wishlist" th:data-id="${property.id}" aria-label="Thêm vào yêu thích">
+                                                <i class="fas fa-heart"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Hiển thị tin nhắn nếu không có bất động sản nổi bật -->
+                            <div th:if="${featuredProperties == null || featuredProperties.empty}" class="col-12 text-center">
+                                <p>Chưa có bất động sản nổi bật nào. Vui lòng quay lại sau.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/listings" class="cta-button">Xem tất cả bất động sản</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="py-5 bg-light" aria-labelledby="categories-title">
+        <div class="container">
+            <h2 id="categories-title" class="section-title text-center">Danh mục bất động sản</h2>
+            <div class="row">
+                <!-- Căn hộ -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 property-card">
+                        <img src="/assets/images/apartment.jpg" class="card-img-top" alt="Căn hộ cao cấp">
+                        <div class="card-body">
+                            <h5 class="card-title">Căn hộ</h5>
+                            <p class="card-text">Căn hộ cao cấp, chung cư tại các khu vực trung tâm và sầm uất.</p>
+                            <p class="text-muted" th:if="${apartments != null}">
+                                <span th:text="${apartments.size()}">0</span> căn hộ có sẵn
+                            </p>
+                            <a href="/apartments" class="btn btn-primary">Khám phá ngay</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Nhà phố -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 property-card">
+                        <img src="/assets/images/house.jpg" class="card-img-top" alt="Nhà phố hiện đại">
+                        <div class="card-body">
+                            <h5 class="card-title">Nhà phố</h5>
+                            <p class="card-text">Nhà phố và biệt thự tại các khu dân cư cao cấp, tiện nghi.</p>
+                            <p class="text-muted" th:if="${houses != null}">
+                                <span th:text="${houses.size()}">0</span> nhà phố có sẵn
+                            </p>
+                            <a href="/townhouses" class="btn btn-primary">Khám phá ngay</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Đất nền -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 property-card">
+                        <img src="/assets/images/land.jpg" class="card-img-top" alt="Đất nền tiềm năng">
+                        <div class="card-body">
+                            <h5 class="card-title">Đất nền</h5>
+                            <p class="card-text">Đất nền và đất thổ cư tại các khu vực phát triển nhanh.</p>
+                            <p class="text-muted" th:if="${lands != null}">
+                                <span th:text="${lands != null ? lands.size() : 0}">0</span> lô đất có sẵn
+                            </p>
+                            <a href="/land" class="btn btn-primary">Khám phá ngay</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-5" aria-labelledby="why-choose-us-title">
+        <div class="container">
+            <h2 id="why-choose-us-title" class="section-title text-center">Tại sao chọn chúng tôi?</h2>
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <i class="fas fa-house-user display-4 text-primary mb-3"></i>
+                    <h4 class="fs-4 fw-semibold">Bất động sản chất lượng</h4>
+                    <p class="text-gray-600">Chỉ cung cấp các bất động sản đã được kiểm định kỹ lưỡng.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <i class="fas fa-users display-4 text-primary mb-3"></i>
+                    <h4 class="fs-4 fw-semibold">Dịch vụ chuyên nghiệp</h4>
+                    <p class="text-gray-600">Đội ngũ tư vấn tận tâm, hỗ trợ khách hàng 24/7.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <i class="fas fa-shield-alt display-4 text-primary mb-3"></i>
+                    <h4 class="fs-4 fw-semibold">An toàn và bảo mật</h4>
+                    <p class="text-gray-600">Cam kết minh bạch và bảo mật trong mọi giao dịch.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-5 bg-light" aria-labelledby="testimonials-title">
+        <div class="container">
+            <h2 id="testimonials-title" class="section-title text-center">Khách hàng nói gì về chúng tôi</h2>
+            <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="row">
+                            <!-- Có thể thay thế bằng dữ liệu thực từ backend khi có API đánh giá -->
+                            <th:block th:if="${testimonials != null && !testimonials.empty}">
+                                <div th:each="testimonial, testimonialStat : ${testimonials}" th:if="${testimonialStat.index < 3}" class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img th:src="${testimonial.avatarUrl != null ? testimonial.avatarUrl : '/assets/images/avatar-default.jpg'}" th:alt="${testimonial.customerName}" class="rounded-circle me-3" width="50">
+                                                <div>
+                                                    <h5 class="mb-0" th:text="${testimonial.customerName}">Tên khách hàng</h5>
+                                                    <p class="text-muted mb-0" th:text="${testimonial.role}">Vai trò</p>
+                                                </div>
+                                            </div>
+                                            <p class="card-text" th:text="${testimonial.content}">Nội dung đánh giá</p>
+                                            <div class="text-warning">
+                                                <th:block th:each="i : ${#numbers.sequence(1, testimonial.rating)}">
+                                                    <i class="fas fa-star"></i>
+                                                </th:block>
+                                                <th:block th:if="${testimonial.rating % 1 > 0}">
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                </th:block>
+                                                <th:block th:each="i : ${#numbers.sequence(1, 5 - testimonial.rating - (testimonial.rating % 1 > 0 ? 1 : 0))}">
+                                                    <i class="far fa-star"></i>
+                                                </th:block>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                            
+                            <!-- Dữ liệu mẫu nếu không có dữ liệu thực -->
+                            <th:block th:if="${testimonials == null || testimonials.empty}">
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img src="/assets/images/user1.jpg" alt="Nguyễn Văn A" class="rounded-circle me-3" width="50">
+                                                <div>
+                                                    <h5 class="mb-0">Nguyễn Văn A</h5>
+                                                    <p class="text-muted mb-0">Khách hàng</p>
+                                                </div>
+                                            </div>
+                                            <p class="card-text">"Dịch vụ chuyên nghiệp, nhân viên tư vấn nhiệt tình. Tôi đã tìm được căn hộ ưng ý trong thời gian ngắn."</p>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img src="/assets/images/user2.jpg" alt="Trần Thị B" class="rounded-circle me-3" width="50">
+                                                <div>
+                                                    <h5 class="mb-0">Trần Thị B</h5>
+                                                    <p class="text-muted mb-0">Khách hàng</p>
+                                                </div>
+                                            </div>
+                                            <p class="card-text">"Giao dịch nhanh chóng, minh bạch. Tôi rất hài lòng với sự hỗ trợ từ đội ngũ công ty."</p>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star-half-alt"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img src="/assets/images/user3.jpg" alt="Lê Văn C" class="rounded-circle me-3" width="50">
+                                                <div>
+                                                    <h5 class="mb-0">Lê Văn C</h5>
+                                                    <p class="text-muted mb-0">Khách hàng</p>
+                                                </div>
+                                            </div>
+                                            <p class="card-text">"Hỗ trợ sau bán hàng tuyệt vời. Tôi sẽ tiếp tục ủng hộ và giới thiệu cho bạn bè."</p>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="py-5" aria-labelledby="map-title">
+        <div class="container">
+            <h2 id="map-title" class="section-title text-center">Vị trí của chúng tôi</h2>
+            <div class="map-container rounded overflow-hidden">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.447264002246!2d106.69807931474905!3d10.77638969231961!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38e4a8c1cb%3A0x5c50e7c8b4b6d6f!2sHo%20Chi%20Minh%20City%2C%20Vietnam!5e0!3m2!1sen!2sus!4v1634567890123!5m2!1sen!2sus"
+                    width="100%"
+                    height="100%"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    aria-label="Bản đồ văn phòng công ty tại TP.HCM">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-5 bg-gradient-to-r from-blue-900 to-blue-600 text-white" aria-labelledby="cta-title">
+        <div class="container text-center">
+            <h2 id="cta-title" class="mb-4 fw-bold fs-2">Sẵn sàng tìm kiếm ngôi nhà mơ ước?</h2>
+            <p class="lead mb-4">Hãy để chúng tôi đồng hành cùng bạn trên hành trình khám phá bất động sản lý tưởng!</p>
+            <a href="/contact" class="cta-button btn-lg">Liên hệ ngay</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="~{footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

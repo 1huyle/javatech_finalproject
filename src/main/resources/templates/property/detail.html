@@ -1,0 +1,16 @@
+<div class="mt-4 d-flex gap-2">
+    <a th:if="${property.transactionType == T(com.example.demo.model.enums.TransactionType).SALE}" 
+       th:href="@{/property/{id}/purchase(id=${property.id})}" 
+       class="btn btn-primary btn-lg">
+        <i class="bi bi-cash-coin me-2"></i>Mua ngay
+    </a>
+    <a th:if="${property.transactionType == T(com.example.demo.model.enums.TransactionType).RENTAL}" 
+       th:href="@{/transactions/lease/{id}(id=${property.id})}" 
+       class="btn btn-info btn-lg">
+        <i class="bi bi-house-door me-2"></i>Thuê ngay
+    </a>
+    <button id="addToWishlistBtn" class="btn btn-outline-danger btn-lg" 
+            th:data-id="${property.id}" onclick="addToWishlist(this)">
+        <i class="bi bi-heart me-2"></i>Yêu thích
+    </button>
+</div> 

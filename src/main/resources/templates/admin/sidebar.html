@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <nav th:fragment="sidebar(active)" id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <div class="position-sticky pt-3 sidebar-sticky">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${active == 'dashboard' ? 'active' : ''}" aria-current="page" th:href="@{/admin/dashboard}">
+                        <span data-feather="home" class="align-text-bottom"></span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${active == 'properties' ? 'active' : ''}" th:href="@{/admin/properties}">
+                        <span data-feather="file" class="align-text-bottom"></span>
+                        Properties
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${active == 'users' ? 'active' : ''}" th:href="@{/admin/users}">
+                        <span data-feather="users" class="align-text-bottom"></span>
+                        Users
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${active == 'realtors' ? 'active' : ''}" th:href="@{/admin/realtors}">
+                        <span data-feather="briefcase" class="align-text-bottom"></span>
+                        Realtors
+                    </a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link" th:classappend="${active == 'orders' ? 'active' : ''}" th:href="@{/admin/orders}">
+                        <span data-feather="shopping-cart" class="align-text-bottom"></span>
+                        Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${active == 'payments' ? 'active' : ''}" th:href="@{/admin/payments}">
+                        <span data-feather="credit-card" class="align-text-bottom"></span>
+                        Payments
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+
+</body>
+</html> 

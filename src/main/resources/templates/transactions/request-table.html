@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="requestTable(requests)">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Loại yêu cầu</th>
+                <th scope="col">Khách hàng</th>
+                <th scope="col">Bất động sản</th>
+                <th scope="col">Trạng thái</th>
+                <th scope="col">Ngày dự kiến</th>
+                <th scope="col">Môi giới viên</th>
+                <th scope="col">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${requests.empty}">
+                <td colspan="8" class="text-center">Không có yêu cầu nào</td>
+            </tr>
+            <tr th:each="request : ${requests}">
+                <td th:text="${request.id}"></td>
+                <td>
+                    <span th:if="${request instanceof T(com.example.demo.model.PurchaseRequest)}" class="badge bg-primary">Mua bán</span>
+                    <span th:if="${request instanceof T(com.example.demo.model.LeaseRequest)}" class="badge bg-success">Cho thuê</span>
+                </td>
+                <td th:text="${request.user.fullName}"></td>
+                <td>
+                    <a th:href="@{/property/{id}(id=${request.property.id})}" target="_blank" class="text-decoration-none" th:text="${request.property.name}"></a>
+                </td>
+                <td>
+                    <span th:class="${'badge ' + 
+                        (request.status.name() == 'PENDING' ? 'bg-warning' : 
+                        (request.status.name() == 'CONFIRMED' ? 'bg-info' : 
+                        (request.status.name() == 'IN_PROGRESS' ? 'bg-primary' : 
+                        (request.status.name() == 'COMPLETED' ? 'bg-success' : 
+                        (request.status.name() == 'CANCELLED' ? 'bg-secondary' : 'bg-danger'))))}"
+                          th:text="${request.status.name() == 'PENDING' ? 'Đang chờ' : 
+                                  (request.status.name() == 'CONFIRMED' ? 'Đã xác nhận' : 
+                                  (request.status.name() == 'IN_PROGRESS' ? 'Đang thực hiện' : 
+                                  (request.status.name() == 'COMPLETED' ? 'Hoàn thành' : 
+                                  (request.status.name() == 'CANCELLED' ? 'Đã hủy' : 'Từ chối'))))}">
+                    </span>
+                </td>
+                <td th:text="${#temporals.format(request.expectedDate, 'dd/MM/yyyy')}"></td>
+                <td>
+                    <span th:if="${request.assignedRealtor != null}" th:text="${request.assignedRealtor.fullName}"></span>
+                    <span th:if="${request.assignedRealtor == null}" class="text-muted">Chưa phân công</span>
+                </td>
+                <td>
+                    <a th:href="@{/transactions/{id}(id=${request.id})}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-eye"></i> Chi tiết
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html> 

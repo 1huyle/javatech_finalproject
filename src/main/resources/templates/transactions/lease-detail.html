@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết yêu cầu thuê bất động sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background: #facc15;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{header :: header}"></div>
+
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Chi tiết yêu cầu thuê bất động sản</h1>
+            <div>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/orders}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+                <a sec:authorize="!hasRole('ADMIN')" th:href="@{/account}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row">
+            <!-- Thông tin yêu cầu -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Thông tin yêu cầu thuê #<span th:text="${leaseRequest.id}"></span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Trạng thái:</strong></p>
+                                <span th:class="'badge ' + 
+                                    (${leaseRequest.status.name() == 'PENDING'} ? 'bg-warning text-dark' : 
+                                    (${leaseRequest.status.name() == 'COMPLETED'} ? 'bg-success' : 
+                                    (${leaseRequest.status.name() == 'CANCELLED'} ? 'bg-secondary' : 'bg-danger')))"
+                                      th:text="${leaseRequest.status.name() == 'PENDING' ? 'Đang chờ xử lý' : 
+                                            (leaseRequest.status.name() == 'COMPLETED' ? 'Hoàn thành' : 
+                                            (leaseRequest.status.name() == 'CANCELLED' ? 'Đã hủy' : 'Không xác định'))}">
+                                </span>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Ngày tạo:</strong></p>
+                                <p th:text="${#temporals.format(leaseRequest.createdAt, 'dd/MM/yyyy HH:mm')}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Khách hàng:</strong></p>
+                                <p th:text="${leaseRequest.user.fullName + ' (' + leaseRequest.user.email + ')'}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Ngày dự kiến:</strong></p>
+                                <p th:text="${#temporals.format(leaseRequest.expectedDate, 'dd/MM/yyyy')}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Bất động sản:</strong></p>
+                                <p>
+                                    <a th:href="@{/property/{id}(id=${leaseRequest.property.id})}" target="_blank" 
+                                       th:text="${leaseRequest.property.name}"></a>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Môi giới viên:</strong></p>
+                                <p th:if="${leaseRequest.assignedRealtor != null}" 
+                                   th:text="${leaseRequest.assignedRealtor.fullName}"></p>
+                                <p th:if="${leaseRequest.assignedRealtor == null}" class="text-muted">Chưa phân công</p>
+                            </div>
+                        </div>
+
+                        <hr>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Ngày bắt đầu:</strong></p>
+                                <p th:text="${#temporals.format(leaseRequest.startDate, 'dd/MM/yyyy')}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Ngày kết thúc:</strong></p>
+                                <p th:text="${#temporals.format(leaseRequest.endDate, 'dd/MM/yyyy')}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Thời hạn thuê:</strong></p>
+                                <p th:text="${leaseRequest.durationInMonths + ' tháng'}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Đơn vị tính:</strong></p>
+                                <p th:text="${leaseRequest.rentalPeriod}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Tiền thuê hàng tháng:</strong></p>
+                                <p class="text-primary fw-bold" th:text="${#numbers.formatDecimal(leaseRequest.monthlyRent, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Tiền cọc:</strong></p>
+                                <p th:text="${#numbers.formatDecimal(leaseRequest.deposit, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Tổng tiền thuê:</strong></p>
+                                <p th:text="${#numbers.formatDecimal(leaseRequest.totalRentAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Hoa hồng:</strong></p>
+                                <p th:text="${#numbers.formatDecimal(leaseRequest.commissionAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ (' + leaseRequest.commissionRate + '%)'}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" th:if="${leaseRequest.note != null && !leaseRequest.note.isEmpty()}">
+                            <p class="mb-1"><strong>Ghi chú khách hàng:</strong></p>
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-0" th:text="${leaseRequest.note}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" th:if="${leaseRequest.adminNote != null && !leaseRequest.adminNote.isEmpty()}">
+                            <p class="mb-1"><strong>Ghi chú quản trị viên:</strong></p>
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-0" th:text="${leaseRequest.adminNote}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hành động -->
+            <div class="col-md-4">
+                <!-- Cập nhật trạng thái sang Hủy bỏ -->
+                <div class="card mb-4" sec:authorize="hasRole('REALTOR')"
+                     th:if="${leaseRequest.status.name() == 'PENDING'}">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">Hủy yêu cầu thuê</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/transactions/{id}/status(id=${leaseRequest.id})}" method="post">
+                            <input type="hidden" name="status" value="CANCELLED" />
+                            <div class="mb-3">
+                                <label for="cancelLeaseNote" class="form-label">Lý do hủy (Ghi chú)</label>
+                                <textarea id="cancelLeaseNote" name="note" class="form-control" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100">Xác nhận hủy yêu cầu</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Hoàn thành giao dịch thuê -->
+                <div class="card mb-4" sec:authorize="hasRole('REALTOR')"
+                     th:if="${leaseRequest.status.name() == 'PENDING'}">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Hoàn thành giao dịch thuê</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/transactions/lease/{id}/complete(id=${leaseRequest.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn hoàn thành giao dịch thuê này không? Hành động này sẽ tạo hợp đồng thuê, cập nhật trạng thái bất động sản và tạo giao dịch liên quan.');">
+                            <p>Xác nhận hoàn thành yêu cầu thuê này. Hành động này sẽ tạo hợp đồng thuê, cập nhật trạng thái bất động sản và tạo giao dịch liên quan.</p>
+                            <button type="submit" class="btn btn-success w-100">Xác nhận hoàn thành thuê</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mb-4" 
+                     th:if="${leaseRequest.status.name() == 'COMPLETED' || leaseRequest.status.name() == 'CANCELLED'}">
+                     <div class="card-header"
+                          th:classappend="${leaseRequest.status.name() == 'COMPLETED' ? 'bg-success text-white' : 'bg-secondary text-white'}">
+                        <h5 class="mb-0">Thông tin trạng thái</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-0">
+                            Yêu cầu này đã ở trạng thái 
+                            <strong th:text="${leaseRequest.status.name() == 'COMPLETED' ? 'HOÀN THÀNH' : 'ĐÃ HỦY'}"></strong>.
+                            <span th:if="${leaseRequest.completedAt}" 
+                                  th:text="' vào lúc ' + ${#temporals.format(leaseRequest.completedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                            <span th:if="${leaseRequest.cancelledAt}" 
+                                  th:text="' vào lúc ' + ${#temporals.format(leaseRequest.cancelledAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kiểm tra tính khả dụng -->
+                <!-- <div class="card mb-4" sec:authorize="hasAnyRole('ADMIN', 'REALTOR')" 
+                     th:if="${leaseRequest.status.name() == 'PENDING'}">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Kiểm tra tính khả dụng</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Kiểm tra xem bất động sản có khả dụng để thuê trong khoảng thời gian yêu cầu không.</p>
+                        <button type="button" id="btnCheckAvailability" class="btn btn-info w-100">
+                            <i class="bi bi-calendar-check"></i> Kiểm tra tính khả dụng
+                        </button>
+                        <div id="availabilityResult" class="mt-3" style="display: none;"></div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{footer :: footer}"></div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+    
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Kiểm tra tính khả dụng của bất động sản
+            const btnCheckAvailability = document.getElementById('btnCheckAvailability');
+            const availabilityResult = document.getElementById('availabilityResult');
+            
+            if (btnCheckAvailability) {
+                btnCheckAvailability.addEventListener('click', function() {
+                    const propertyId = /*[[${leaseRequest.property.id}]]*/null ;
+                    const startDate = /*[[${#temporals.format(leaseRequest.startDate, 'yyyy-MM-dd')}]]*/null ;
+                    const endDate = /*[[${#temporals.format(leaseRequest.endDate, 'yyyy-MM-dd')}]]*/null;
+                    
+                    // Hiển thị đang tải
+                    availabilityResult.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><span class="ms-2">Đang kiểm tra...</span></div>';
+                    availabilityResult.style.display = 'block';
+                    
+                    // Gọi API kiểm tra
+                    fetch(`/transactions/api/check-availability?propertyId=${propertyId}&startDate=${startDate}&endDate=${endDate}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.available) {
+                                availabilityResult.innerHTML = '<div class="alert alert-success mb-0">Bất động sản khả dụng trong khoảng thời gian này.</div>';
+                            } else {
+                                availabilityResult.innerHTML = '<div class="alert alert-danger mb-0">Bất động sản không khả dụng trong khoảng thời gian này.</div>';
+                            }
+                        })
+                        .catch(error => {
+                            availabilityResult.innerHTML = '<div class="alert alert-danger mb-0">Lỗi khi kiểm tra: ' + error.message + '</div>';
+                        });
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

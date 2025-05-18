@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Your Email</title>
+</head>
+<body>
+    <h2>Welcome to Real Estate Management System</h2>
+    <p>Please click the link below to verify your email address:</p>
+    <a th:href="@{http://localhost:8081/api/auth/verify(token=${token})}">Verify Email</a>
+    <p>This link will expire in 24 hours.</p>
+    <p>If you did not create an account, please ignore this email.</p>
+</body>
+</html> 

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Thanh toán an toàn và nhanh chóng cho các giao dịch bất động sản tại Việt Nam. Hỗ trợ thẻ tín dụng, chuyển khoản ngân hàng, VNPay, Momo và hơn thế nữa.">
+    <meta name="keywords" content="thanh toán bất động sản, thanh toán an toàn, mua bán nhà đất, VNPay, Momo, Việt Nam">
+    <meta name="author" content="Bất Động Sản">
+    <title>Thanh toán - Bất Động Sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background: #facc15;
+            border-radius: 2px;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #facc15;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
+        }
+        .btn-primary {
+            background: #facc15;
+            border: none;
+            color: #1e3a8a;
+            font-weight: 600;
+            border-radius: 9999px;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #eab308;
+            transform: scale(1.05);
+        }
+        .security-badge {
+            background: #e6f3ff;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .payment-method-icon {
+            width: 40px;
+            margin-right: 10px;
+        }
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 1.5rem;
+            }
+            .card-body {
+                padding: 1rem;
+            }
+            .order-summary-sidebar {
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="header :: header"></div>
+
+    <!-- Main Content -->
+    <main class="container my-5" aria-labelledby="payment-title">
+        <div class="row">
+            <!-- Payment Form -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 id="payment-title" class="section-title">Thanh toán</h2>
+                        <form id="paymentForm" novalidate>
+                            <!-- Order Summary -->
+                            <div class="mb-4">
+                                <h4 class="fw-semibold">Thông tin đơn hàng</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-muted">Mã giao dịch:</td>
+                                                <td id="transactionId">TXN123456</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Tên bất động sản:</td>
+                                                <td id="propertyName">Căn hộ cao cấp Quận 1</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Giá:</td>
+                                                <td id="propertyPrice">2.500.000.000 VNĐ</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Phí dịch vụ:</td>
+                                                <td id="serviceFee">50.000.000 VNĐ</td>
+                                            </tr>
+                                            <tr class="table-active">
+                                                <td><strong>Tổng cộng:</strong></td>
+                                                <td id="totalAmount"><strong>2.550.000.000 VNĐ</strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div class="mb-4">
+                                <h4 class="fw-semibold">Phương thức thanh toán</h4>
+                                <div class="mb-3">
+                                    <select class="form-select" id="paymentMethod" name="paymentMethod" required aria-label="Phương thức thanh toán">
+                                        <option value="">Chọn phương thức thanh toán</option>
+                                        <option value="card">Thẻ tín dụng/ghi nợ</option>
+                                        <option value="bankTransfer">Chuyển khoản ngân hàng</option>
+                                        <option value="vnpay">VNPay</option>
+                                        <option value="momo">Momo</option>
+                                    </select>
+                                    <div class="invalid-feedback">Vui lòng chọn phương thức thanh toán.</div>
+                                </div>
+
+                                <!-- Card Payment Fields -->
+                                <div id="cardFields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="cardNumber" class="form-label">Số thẻ</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" required pattern="\d{16}">
+                                            <span class="input-group-text"><i class="fa fa-credit-card"></i></span>
+                                        </div>
+                                        <div class="invalid-feedback">Vui lòng nhập số thẻ 16 chữ số hợp lệ.</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="expiryDate" class="form-label">Ngày hết hạn</label>
+                                            <input type="text" class="form-control" id="expiryDate" name="expiryDate" placeholder="MM/YY" required pattern="\d{2}/\d{2}">
+                                            <div class="invalid-feedback">Vui lòng nhập định dạng MM/YY.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cvv" class="form-label">CVV</label>
+                                            <input type="text" class="form-control" id="cvv" name="cvv" placeholder="123" required pattern="\d{3}">
+                                            <div class="invalid-feedback">Vui lòng nhập mã CVV 3 chữ số.</div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="nameOnCard" class="form-label">Tên in trên thẻ</label>
+                                        <input type="text" class="form-control" id="nameOnCard" name="nameOnCard" required>
+                                        <div class="invalid-feedback">Vui lòng nhập tên in trên thẻ.</div>
+                                    </div>
+                                </div>
+
+                                <!-- Bank Transfer Fields -->
+                                <div id="bankTransferFields" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <h5>Thông tin chuyển khoản</h5>
+                                        <p>Ngân hàng: <strong>Vietcombank</strong></p>
+                                        <p>Số tài khoản: <strong>1234567890</strong></p>
+                                        <p>Chủ tài khoản: <strong>CÔNG TY BẤT ĐỘNG SẢN ABC</strong></p>
+                                        <p>Nội dung: <strong>GD <span id="bankTransactionId">TXN123456</span></strong></p>
+                                        <p class="text-muted">Vui lòng chuyển khoản trong vòng 24 giờ để xác nhận giao dịch.</p>
+                                    </div>
+                                </div>
+
+                                <!-- VNPay Fields -->
+                                <div id="vnpayFields" style="display: none;">
+                                    <div class="alert alert-success">
+                                        <h5>Thanh toán qua VNPay</h5>
+                                        <p>Nhấn nút "Thanh toán" để chuyển hướng đến cổng thanh toán VNPay.</p>
+                                        <img src="../assets/images/vnpay-logo.png" alt="VNPay" class="payment-method-icon">
+                                    </div>
+                                </div>
+
+                                <!-- Momo Fields -->
+                                <div id="momoFields" style="display: none;">
+                                    <div class="alert alert-success">
+                                        <h5>Thanh toán qua Momo</h5>
+                                        <p>Nhấn nút "Thanh toán" để chuyển hướng đến cổng thanh toán Momo.</p>
+                                        <img src="../assets/images/momo-logo.png" alt="Momo" class="payment-method-icon">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Billing Information -->
+                            <div class="mb-4">
+                                <h4 class="fw-semibold">Thông tin thanh toán</h4>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="billingName" class="form-label">Họ và tên</label>
+                                        <input type="text" class="form-control" id="billingName" name="billingName" required>
+                                        <div class="invalid-feedback">Vui lòng nhập họ và tên.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="billingEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="billingEmail" name="billingEmail" required>
+                                        <div class="invalid-feedback">Vui lòng nhập email hợp lệ.</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="billingAddress" class="form-label">Địa chỉ</label>
+                                    <input type="text" class="form-control" id="billingAddress" name="billingAddress" required>
+                                    <div class="invalid-feedback">Vui lòng nhập địa chỉ.</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="billingCity" class="form-label">Thành phố</label>
+                                        <input type="text" class="form-control" id="billingCity" name="billingCity" required>
+                                        <div class="invalid-feedback">Vui lòng nhập thành phố.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="billingPhone" class="form-label">Số điện thoại</label>
+                                        <input type="tel" class="form-control" id="billingPhone" name="billingPhone" required pattern="\+84\d{9,10}|\d{10}">
+                                        <div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitButton">
+                                    <span id="submitText">Thanh toán</span>
+                                    <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="col-md-4 order-summary-sidebar">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Tóm tắt đơn hàng</h4>
+                        <div class="property-summary mb-4">
+                            <img id="propertyImage" src="../assets/images/property1.jpg" alt="Căn hộ cao cấp Quận 1" class="img-fluid rounded mb-3">
+                            <h5 id="propertyTitle">Căn hộ cao cấp Quận 1</h5>
+                            <p id="propertyLocation" class="text-muted">Quận 1, TP.HCM</p>
+                        </div>
+                        <div class="price-summary">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Giá bất động sản:</span>
+                                <span id="summaryPrice">2.500.000.000 VNĐ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Phí dịch vụ:</span>
+                                <span id="summaryFee">50.000.000 VNĐ</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <strong>Tổng cộng:</strong>
+                                <strong id="summaryTotal">2.550.000.000 VNĐ</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Notice -->
+                <div class="card mt-4 security-badge">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fa fa-shield-alt me-2"></i>Bảo mật thanh toán</h5>
+                        <p class="card-text">Thông tin thanh toán của bạn được bảo vệ bởi công nghệ mã hóa SSL 256-bit, đảm bảo an toàn tuyệt đối.</p>
+                        <div class="d-flex align-items-center">
+                            <img src="../assets/images/ssl-badge.png" alt="SSL Secure" height="30" class="me-2">
+                            <span>Thanh toán an toàn</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="footer :: footer"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Load header and footer
+            $("#header").load("../templates/header.html", function() {
+                console.log("Header loaded successfully");
+            });
+            $("#footer").load("../templates/footer.html", function() {
+                console.log("Footer loaded successfully");
+            });
+
+            // Toggle payment method fields
+            $('#paymentMethod').on('change', function() {
+                $('#cardFields, #bankTransferFields, #vnpayFields, #momoFields').hide();
+                if (this.value === 'card') {
+                    $('#cardFields').fadeIn();
+                } else if (this.value === 'bankTransfer') {
+                    $('#bankTransferFields').fadeIn();
+                } else if (this.value === 'vnpay') {
+                    $('#vnpayFields').fadeIn();
+                } else if (this.value === 'momo') {
+                    $('#momoFields').fadeIn();
+                }
+            });
+
+            // Form validation and submission
+            const form = document.getElementById('paymentForm');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (form.checkValidity()) {
+                    const submitButton = $('#submitButton');
+                    const submitText = $('#submitText');
+                    const loadingSpinner = $('#loadingSpinner');
+                    const toast = $('.toast');
+                    const toastBody = $('.toast-body');
+
+                    // Show loading state
+                    submitButton.prop('disabled', true);
+                    submitText.addClass('d-none');
+                    loadingSpinner.removeClass('d-none');
+
+                    // Simulate payment processing
+                    setTimeout(() => {
+                        submitButton.prop('disabled', false);
+                        submitText.removeClass('d-none');
+                        loadingSpinner.addClass('d-none');
+
+                        // Show success toast
+                        toastBody.text('Thanh toán thành công! Bạn sẽ được chuyển hướng đến trang xác nhận.');
+                        toast.toast('show');
+
+                        // Redirect to success page (placeholder)
+                        setTimeout(() => {
+                            window.location.href = '../pages/payment-success.html';
+                        }, 2000);
+                    }, 1500);
+                } else {
+                    form.classList.add('was-validated');
+                    const toast = $('.toast');
+                    const toastBody = $('.toast-body');
+                    toastBody.text('Vui lòng điền đầy đủ và chính xác các thông tin.');
+                    toast.toast('show');
+                }
+            });
+
+            // Input masking (basic example)
+            $('#cardNumber').on('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 16) value = value.slice(0, 16);
+                this.value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+            });
+
+            $('#expiryDate').on('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 4) value = value.slice(0, 4);
+                if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2);
+                this.value = value;
+            });
+
+            $('#cvv').on('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 3) value = value.slice(0, 3);
+                this.value = value;
+            });
+        });
+    </script>
+</body>
+</html>

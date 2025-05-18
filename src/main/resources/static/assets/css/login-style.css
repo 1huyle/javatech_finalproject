@@ -1,0 +1,161 @@
+body {
+    font-family: 'Arial', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+}
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 60, 114, 0.7); /* Overlay xanh dương đậm */
+    z-index: 1;
+}
+.login-container {
+    position: relative;
+    z-index: 2;
+    max-width: 400px;
+    width: 100%;
+    padding: 20px;
+}
+.login-form {
+    text-align: center;
+    color: #fff;
+}
+.login-form .logo {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+.login-form h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+.form-control {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #333;
+}
+.form-control::placeholder {
+    color: #aaa;
+}
+.input-group {
+    position: relative;
+}
+.input-group .toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 40%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+}
+.btn-signin {
+    background: #f5a623;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+.btn-signin:hover {
+    background: #e69500;
+}
+.form-check {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.form-check-label {
+    color: #fff;
+    font-size: 0.9rem;
+}
+.form-check-input {
+    margin-right: 5px;
+}
+.forget-password {
+    color: #fff;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+.forget-password:hover {
+    text-decoration: underline;
+}
+.register-link {
+    color: #fff;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+.register-link a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+.register-link a:hover {
+    text-decoration: underline;
+}
+.divider {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+}
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #fff;
+    margin: 0 10px;
+}
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.btn-social {
+    background: #fff;
+    color: #333;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+.btn-social:hover {
+    background: #f0f0f0;
+}
+@media (max-width: 576px) {
+    .login-container {
+        padding: 15px;
+    }
+    .login-form h2 {
+        font-size: 1.2rem;
+    }
+    .form-control,
+    .btn-signin,
+    .btn-social {
+        font-size: 0.9rem;
+        padding: 10px 15px;
+    }
+}

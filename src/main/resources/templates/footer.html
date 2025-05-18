@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Footer Fragment</title>
+</head>
+<body>
+  <footer th:fragment="footer" class="bg-gray-900 text-gray-300 pt-12 pb-8">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+        <!-- Logo & mô tả -->
+        <div>
+          <h2 class="text-2xl font-bold text-white mb-4">BĐS Land</h2>
+          <p>Nền tảng bất động sản hàng đầu, kết nối người mua và người bán một cách nhanh chóng và hiệu quả.</p>
+          <img src="/assets/images/logo.png" alt="Bất Động Sản Logo" class="footer-logo mb-3">
+        </div>
+
+        <!-- Liên kết nhanh -->
+        <div>
+          <h5 class="text-xl font-semibold mb-4">Liên kết nhanh</h5>
+          <ul class="space-y-2">
+            <li><a href="#" class="hover:text-green-400 transition">Trang chủ</a></li>
+            <li><a href="#" class="hover:text-green-400 transition">Bất động sản</a></li>
+            <li><a href="#" class="hover:text-green-400 transition">Tin tức</a></li>
+            <li><a href="#" class="hover:text-green-400 transition">Liên hệ</a></li>
+          </ul>
+        </div>
+
+        <!-- Thông tin liên hệ -->
+        <div>
+          <h5 class="text-xl font-semibold mb-4">Liên hệ</h5>
+          <ul class="space-y-2">
+            <li><i class="fas fa-map-marker-alt mr-2"></i>123 Đường ABC, Q.1, TP.HCM</li>
+            <li><i class="fas fa-phone mr-2"></i> (84) 123-456-789</li>
+            <li><i class="fas fa-envelope mr-2"></i> info@batdongsan.com</li>
+            <li><i class="fas fa-clock mr-2"></i> T2-T6: 08:00 - 17:30</li>
+          </ul>
+        </div>
+
+        <!-- Newsletter -->
+        <div>
+          <h5 class="text-xl font-semibold mb-4">Nhận bản tin</h5>
+          <p class="mb-4">Nhận thông tin mới nhất về thị trường bất động sản.</p>
+          <form class="flex flex-col space-y-2">
+            <input type="email" placeholder="Nhập email của bạn" class="px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400">
+            <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition">
+              Đăng ký
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Mạng xã hội -->
+      <div class="mt-10 flex justify-center space-x-6 text-xl">
+        <a href="#" class="hover:text-green-400"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="hover:text-green-400"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="hover:text-green-400"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="hover:text-green-400"><i class="fab fa-youtube"></i></a>
+      </div>
+
+      <hr class="my-8 border-gray-700">
+
+      <p class="text-center text-sm text-gray-500">© 2024 BĐS Land. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

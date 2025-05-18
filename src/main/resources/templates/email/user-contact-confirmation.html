@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Xác nhận yêu cầu liên hệ</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <p th:text="'Chào ' + ${userName} + ','"></p>
+    <p>Chúng tôi đã nhận được yêu cầu liên hệ của bạn cho bất động sản: <strong th:text="${propertyName}"></strong>.</p>
+    <p th:text="${realtorName} + ' sẽ sớm liên hệ với bạn.'"></p>
+    <p><strong>Nội dung tin nhắn của bạn:</strong></p>
+    <blockquote th:utext="${#strings.replace(contactMessage, '\n', '<br />')}"></blockquote>
+    <p>Cảm ơn bạn đã quan tâm!</p>
+    <p>Để xem thêm các bất động sản khác, vui lòng truy cập: <a th:href="${propertyLink}" th:text="${siteBaseUrl}"></a></p>
+    <p>Trân trọng,<br />Đội ngũ Real Estate</p>
+</body>
+</html> 

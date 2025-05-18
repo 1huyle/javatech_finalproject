@@ -1,0 +1,188 @@
+body {
+    font-family: 'Arial', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+}
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 60, 114, 0.7); /* Overlay xanh dương đậm */
+    z-index: 1;
+}
+.register-container {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+    width: 100%;
+    padding: 30px;
+}
+.register-form {
+    text-align: center;
+    color: #fff;
+}
+.register-form .logo {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+.register-form h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+.step {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 50%;
+    background: #ccc;
+    color: #fff;
+    margin: 0 10px;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+.step.active {
+    background: #f5a623;
+}
+.form-step {
+    display: none;
+}
+.form-step.active {
+    display: block;
+}
+.form-control {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #333;
+}
+.form-control::placeholder {
+    color: #aaa;
+}
+.input-group {
+    position: relative;
+}
+.input-group .toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+}
+.btn-navigate {
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin: 0 5px;
+    transition: background 0.3s ease;
+}
+.btn-navigate:hover {
+    background: #5a6268;
+}
+.btn-register {
+    background: #f5a623;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+.btn-register:hover {
+    background: #e69500;
+}
+.form-check {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.form-check.mb-3 {
+    text-align: left;
+    justify-content: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 10px 15px;
+    transition: background 0.3s ease;
+}
+.form-check.mb-3:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+.form-check-label {
+    color: #fff;
+    font-size: 0.9rem;
+}
+.form-check small.text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 0.8rem;
+}
+.form-check-label a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+.form-check-label a:hover {
+    text-decoration: underline;
+}
+.login-link {
+    color: #fff;
+    font-size: 0.9rem;
+    margin-top: 1.5rem;
+}
+.login-link a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+.login-link a:hover {
+    text-decoration: underline;
+}
+.alert {
+    border-radius: 25px;
+    margin-bottom: 1rem;
+}
+@media (max-width: 576px) {
+    .register-container {
+        padding: 15px;
+    }
+    .register-form h2 {
+        font-size: 1.4rem;
+    }
+    .form-control,
+    .btn-register,
+    .btn-navigate {
+        font-size: 0.9rem;
+        padding: 10px 15px;
+    }
+    .step {
+        width: 25px;
+        height: 25px;
+        line-height: 25px;
+        font-size: 0.9rem;
+    }
+}

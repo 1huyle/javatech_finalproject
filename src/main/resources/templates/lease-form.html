@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký thuê bất động sản - Bất Động Sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background: #facc15;
+            border-radius: 2px;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #facc15;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
+        }
+        .btn-primary {
+            background: #facc15;
+            border: none;
+            color: #1e3a8a;
+            font-weight: 600;
+            border-radius: 9999px;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #eab308;
+            transform: scale(1.05);
+        }
+        .property-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="container py-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card fade-in">
+                    <div class="card-body p-4">
+                        <h1 class="section-title">Đăng ký thuê bất động sản</h1>
+                        <div class="alert alert-info mb-4">
+                            <p><i class="bi bi-info-circle me-2"></i> Vui lòng điền đầy đủ thông tin để đăng ký thuê bất động sản.</p>
+                        </div>
+                        
+                        <!-- Property Info -->
+                        <div class="mb-4" th:if="${property != null}">
+                            <h2 class="h4 mb-3">Thông tin bất động sản</h2>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <img th:src="${property.fileUrl != null ? property.fileUrl : '/assets/images/property-default.jpg'}" 
+                                         alt="Hình ảnh bất động sản" class="property-image">
+                                </div>
+                                <div class="col-md-8">
+                                    <h3 class="h5 mb-2" th:text="${property.name != null ? property.name : 'Bất động sản'}">Căn hộ cao cấp</h3>
+                                    <p class="mb-1"><strong>Địa chỉ:</strong> <span th:text="${property.address != null ? property.address : 'Chưa cập nhật'}">Địa chỉ</span></p>
+                                    <p class="mb-1"><strong>Diện tích:</strong> <span th:text="${property.area != null ? property.area + ' m²' : 'Chưa cập nhật'}">100 m²</span></p>
+                                    <p class="mb-1"><strong>Giá thuê:</strong> <span class="text-primary" th:text="${property.price != null ? #numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ/tháng' : 'Liên hệ'}">10.000.000 VNĐ/tháng</span></p>
+                                    <p class="mb-1"><strong>Loại bất động sản:</strong> <span th:text="${property.propertyType != null && property.propertyType.name != null ? property.propertyType.name : 'Không rõ'}">Căn hộ</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lease Form -->
+                        <form id="leaseForm" method="post" th:action="@{/transactions/lease}" class="needs-validation" novalidate>
+                            <input type="hidden" id="propertyId" name="propertyId" th:value="${property != null ? property.id : ''}">
+                            <input type="hidden" id="expectedDate" name="expectedDate" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" />
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="startDate" class="form-label">Ngày bắt đầu thuê <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="endDate" class="form-label">Ngày kết thúc thuê <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="endDate" name="endDate" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="monthlyRent" class="form-label">Giá thuê hàng tháng (VNĐ) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="monthlyRent" name="monthlyRent" 
+                                           th:value="${property != null && property.price != null ? property.price : ''}" required min="0" step="1000000">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="deposit" class="form-label">Tiền đặt cọc (VNĐ) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="deposit" name="deposit" 
+                                           th:value="${property != null && property.price != null ? property.price * 2 : ''}" required min="0" step="1000000">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="paymentMethod" class="form-label">Phương thức thanh toán <span class="text-danger">*</span></label>
+                                <select class="form-select" id="paymentMethod" name="paymentMethod" required>
+                                    <option value="">-- Chọn phương thức thanh toán --</option>
+                                    <option value="CASH">Tiền mặt</option>
+                                    <option value="BANK_TRANSFER">Chuyển khoản ngân hàng</option>
+                                    <option value="CREDIT_CARD">Thẻ tín dụng</option>
+                                    <option value="INSTALLMENT">Trả góp</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="note" class="form-label">Ghi chú</label>
+                                <textarea class="form-control" id="note" name="note" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                    <label class="form-check-label" for="termsCheck">
+                                        Tôi đã đọc và đồng ý với <a href="#" class="text-primary">điều khoản và điều kiện</a>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary" id="leaseSubmit">
+                                    <span id="leaseSubmitText"><i class="bi bi-check-circle me-2"></i>Đăng ký thuê</span>
+                                    <span id="leaseLoadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+        <div class="toast-header">
+            <strong class="me-auto">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Set min date to today
+            const today = new Date().toISOString().split('T')[0];
+            $('#startDate').attr('min', today);
+            
+            // Set min date for end date based on start date
+            $('#startDate').on('change', function() {
+                const startValue = $(this).val();
+                $('#endDate').attr('min', startValue);
+                
+                // If end date is before start date, reset it
+                if ($('#endDate').val() < startValue) {
+                    $('#endDate').val('');
+                }
+            });
+            
+            // Calculate rental period in months
+            function calculateRentalPeriod() {
+                const startDate = new Date($('#startDate').val());
+                const endDate = new Date($('#endDate').val());
+                
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    return 0;
+                }
+                
+                const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+                               endDate.getMonth() - startDate.getMonth();
+                return months;
+            }
+            
+            // Form submission
+            $('#leaseForm').on('submit', function(event) {
+                event.preventDefault();
+                
+                // Validate form
+                if (!this.checkValidity()) {
+                    event.stopPropagation();
+                    $(this).addClass('was-validated');
+                    return;
+                }
+                
+                // Show loading spinner
+                $('#leaseSubmitText').addClass('d-none');
+                $('#leaseLoadingSpinner').removeClass('d-none');
+                
+                // Get form data
+                const formData = {
+                    propertyId: $('#propertyId').val(),
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                    monthlyRent: $('#monthlyRent').val(),
+                    deposit: $('#deposit').val(),
+                    paymentMethod: $('#paymentMethod').val(),
+                    note: $('#note').val()
+                };
+                
+                // API call simulation
+                setTimeout(() => {
+                    // Hide loading spinner
+                    $('#leaseSubmitText').removeClass('d-none');
+                    $('#leaseLoadingSpinner').addClass('d-none');
+                    
+                    // Show success message
+                    showToast('Đăng ký thuê bất động sản thành công. Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.');
+                    
+                    // Reset form
+                    $('#leaseForm')[0].reset();
+                    $(this).removeClass('was-validated');
+                }, 1500);
+            });
+            
+            // Show toast function
+            function showToast(message) {
+                const toastBody = $('.toast-body');
+                toastBody.text(message);
+                $('.toast').toast('show');
+            }
+        });
+    </script>
+</body>
+</html> 

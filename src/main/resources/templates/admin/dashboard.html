@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tổng quan quản lý bất động sản dành cho admin">
+    <title>Tổng quan - Admin</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link href="/assets/css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{admin/header :: header}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{admin/sidebar :: sidebar(active='dashboard')}"></div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Dashboard</h1>
+                </div>
+
+                <!-- Thống kê tổng quan -->
+                <div class="row">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Tổng số bất động sản</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${totalProperties}">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-home fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Tổng doanh thu</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${totalRevenue}">0 VNĐ</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Đơn hàng mới</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${newOrders}">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Khách hàng mới</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${newCustomers}">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Doanh thu theo tháng</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-area">
+                                <canvas id="revenueChart"></canvas> <!-- ID cho biểu đồ doanh thu -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Phân bố loại bất động sản</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-pie">
+                                    <canvas id="propertyTypeChart"></canvas> <!-- ID cho biểu đồ loại BĐS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng đơn hàng gần đây -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Đơn hàng gần đây</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã đơn hàng</th>
+                                        <th>Khách hàng</th>
+                                        <th>Bất động sản</th>
+                                        <th>Giá trị</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày tạo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="order : ${recentOrders}">
+                                        <td th:text="${order.id}">#12345</td>
+                                        <td th:text="${order.customerName}">Nguyễn Văn A</td>
+                                        <td th:text="${order.propertyName}">Căn hộ cao cấp</td>
+                                        <td th:text="${order.amount}">2.500.000.000 VNĐ</td>
+                                        <td>
+                                            <span class="badge" th:classappend="${order.status == 'COMPLETED' ? 'bg-success' : 
+                                                                                order.status == 'PENDING' ? 'bg-warning' : 
+                                                                                'bg-danger'}"
+                                                  th:text="${order.status}">Hoàn thành</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy')}">01/01/2024</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    </div>
+            </main>
+        </div>
+    </div>
+
+    <div th:replace="~{admin/footer :: footer}"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/assets/js/admin.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Biến toàn cục để lưu trữ các instance của Chart
+        let revenueChartInstance = null;
+        let propertyTypeChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const monthlyRevenueData = /*[[${monthlyRevenueData}]]*/ null;
+            const propertyTypeData = /*[[${propertyTypeData}]]*/ null;
+
+            // Đảm bảo hủy tất cả các chart hiện có trước khi tạo mới
+            if (Chart.getChart('revenueChart')) {
+                Chart.getChart('revenueChart').destroy();
+            }
+            
+            if (Chart.getChart('propertyTypeChart')) {
+                Chart.getChart('propertyTypeChart').destroy();
+            }
+
+            // Revenue Chart
+            if (monthlyRevenueData) {
+                const revenueLabels = Object.keys(monthlyRevenueData);
+                const revenueValues = Object.values(monthlyRevenueData);
+                const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+
+                // Hủy biểu đồ cũ nếu tồn tại
+                if (revenueChartInstance) {
+                    revenueChartInstance.destroy();
+                }
+
+                revenueChartInstance = new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: revenueLabels,
+                        datasets: [{
+                            label: 'Doanh thu (VNĐ)',
+                            data: revenueValues,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Property Type Chart
+            if (propertyTypeData) {
+                const propertyTypeLabels = Object.keys(propertyTypeData);
+                const propertyTypeValues = Object.values(propertyTypeData);
+                const backgroundColors = propertyTypeLabels.map(() => `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.7)`);
+                const propertyTypeCtx = document.getElementById('propertyTypeChart').getContext('2d');
+
+                // Hủy biểu đồ cũ nếu tồn tại
+                if (propertyTypeChartInstance) {
+                    propertyTypeChartInstance.destroy();
+                }
+
+                propertyTypeChartInstance = new Chart(propertyTypeCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: propertyTypeLabels,
+                        datasets: [{
+                            label: 'Số lượng',
+                            data: propertyTypeValues,
+                            backgroundColor: backgroundColors,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        /*]]>*/
+    </script>
+    <!-- Thêm trước </body> -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11" id="toastContainer"></div>
+</body>
+</html>

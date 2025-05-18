@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Fragment</title>
+</head>
+<body>
+    <!-- Header Fragment -->
+    <header th:fragment="header" class="header py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="/" class="logo flex items-center">
+                <img src="/assets/images/logo.png" alt="Bất Động Sản Logo" class="h-20 w-auto">
+                <span class="ml-3 text-xl font-bold text-gray-800">Bất Động Sản</span>
+            </a>
+            <button class="md:hidden text-gray-800 focus:outline-none" id="menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            <div class="hidden md:flex items-center space-x-6 nav-menu">
+                <nav class="flex space-x-6 items-center">
+                    <a href="/" class="nav-link">Trang chủ</a>
+                    <div class="relative dropdown">
+                        <a href="/listings" class="nav-link flex items-center">
+                            Sản phẩm
+                            <i class="fas fa-chevron-down ml-1 text-sm"></i>
+                        </a>
+                        <div class="dropdown-menu absolute mt-2 py-2">
+                            <a href="/apartments" class="block">Căn hộ</a>
+                            <a href="/villas" class="block">Biệt thự</a>
+                            <a href="/condominiums" class="block">Chung cư</a>
+                            <a href="/townhouses" class="block">Nhà phố</a>
+                            <a href="/offices" class="block">Văn phòng</a>
+                            <a href="/land" class="block">Đất nền</a>
+                        </div>
+                    </div>
+                    <a href="/sales" class="nav-link">Mua bán</a>
+                    <a href="/rentals" class="nav-link">Cho thuê</a>
+                    <a href="/about" class="nav-link font-semibold">Giới thiệu</a>
+                    <a href="javascript:void(0)" onclick="window.redirectToAccount()" class="nav-link">Tài khoản</a>
+                    <span class="nav-link" id="authSeparator" style="display: none;">|</span>
+                    <a href="javascript:void(0)" onclick="window.logoutUser()" class="nav-link" id="logoutLink" style="display: none;">Đăng xuất</a>
+                </nav>
+              
+                <a href="/contact" class="cta-button">Liên hệ ngay</a>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu md:hidden bg-white shadow-lg hidden">
+            <nav class="flex flex-col space-y-4 p-4">
+                <a href="/" class="nav-link text-gray-600 hover:text-blue-500">Trang chủ</a>
+                <div class="dropdown">
+                    <a href="/listings" class="nav-link text-gray-600 hover:text-blue-500 flex items-center" id="products-toggle-mobile">
+                        Sản phẩm
+                        <i class="fas fa-chevron-down ml-1 text-sm"></i>
+                    </a>
+                    <div class="dropdown-menu flex-col space-y-2 pl-4" id="dropdown-menu-mobile">
+                        <a href="/apartments" class="block text-gray-600 hover:text-blue-500">Căn hộ</a>
+                        <a href="/villas" class="block text-gray-600 hover:text-blue-500">Biệt thự</a>
+                        <a href="/condominiums" class="block text-gray-600 hover:text-blue-500">Chung cư</a>
+                        <a href="/townhouses" class="block text-gray-600 hover:text-blue-500">Nhà phố</a>
+                        <a href="/offices" class="block text-gray-600 hover:text-blue-500">Văn phòng</a>
+                        <a href="/land" class="block text-gray-600 hover:text-blue-500">Đất nền</a>
+                    </div>
+                </div>
+                <a href="/sales" class="nav-link text-gray-600 hover:text-blue-500">Mua bán</a>
+                <a href="/rentals" class="nav-link text-gray-600 hover:text-blue-500">Cho thuê</a>
+                <a href="/about" class="nav-link text-gray-600 hover:text-blue-500 font-semibold">Giới thiệu</a>
+                <a href="javascript:void(0)" onclick="window.redirectToAccount()" class="nav-link text-gray-600 hover:text-blue-500">Tài khoản</a>
+                <span class="nav-link text-gray-600 hover:text-blue-500" id="authSeparatorMobile" style="display: none;">|</span>
+                <a href="javascript:void(0)" onclick="window.logoutUser()" class="nav-link text-gray-600 hover:text-blue-500" id="mobileLogoutLink" style="display: none;">Đăng xuất</a>
+                <a href="/contact" class="cta-button">Liên hệ ngay</a>
+            </nav>
+        </div>
+        <!-- JavaScript for header functionality -->
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                const menuToggle = document.getElementById('menu-toggle');
+                const mobileMenu = document.getElementById('mobile-menu');
+                const productsToggleMobile = document.getElementById('products-toggle-mobile');
+                const dropdownMenuMobile = productsToggleMobile ? productsToggleMobile.nextElementSibling : null;
+
+                // Define redirectToAccount if it's not defined elsewhere
+                if (typeof window.redirectToAccount !== 'function') {
+                    window.redirectToAccount = function() {
+                        const token = localStorage.getItem('token');
+                        if (token) {
+                            window.location.href = '/account';
+                        } else {
+                            window.location.href = '/login';
+                        }
+                    };
+                }
+
+                // Define logoutUser function
+                if (typeof window.logoutUser !== 'function') {
+                    window.logoutUser = function() {
+                        // Call the logout API endpoint
+                        fetch('/api/auth/logout', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                                'Content-Type': 'application/json'
+                            },
+                            credentials: 'include'
+                        }).finally(() => {
+                            // Clear token and user data even if the request fails
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            // Redirect to login page
+                            window.location.href = '/login?logout=true';
+                        });
+                    };
+                }
+                
+                // Check if user is logged in to show/hide logout link
+                const token = localStorage.getItem('token');
+                const logoutLink = document.getElementById('logoutLink');
+                const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+                const authSeparator = document.getElementById('authSeparator');
+                const authSeparatorMobile = document.getElementById('authSeparatorMobile');
+                
+                if (token) {
+                    if (logoutLink) logoutLink.style.display = 'block';
+                    if (mobileLogoutLink) mobileLogoutLink.style.display = 'block';
+                    if (authSeparator) authSeparator.style.display = 'block';
+                    if (authSeparatorMobile) authSeparatorMobile.style.display = 'block';
+                }
+
+                // Toggle mobile menu
+                if (menuToggle) {
+                    menuToggle.addEventListener('click', () => {
+                        mobileMenu.classList.toggle('hidden');
+                        if (mobileMenu.classList.contains('hidden') && dropdownMenuMobile) {
+                            dropdownMenuMobile.classList.remove('active');
+                        }
+                    });
+                }
+
+                // Toggle mobile dropdown
+                if (productsToggleMobile && dropdownMenuMobile) {
+                    productsToggleMobile.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation(); // Stop event from bubbling up
+                        dropdownMenuMobile.classList.toggle('active');
+                    });
+                }
+                
+                // Ensure desktop dropdowns work with both hover and click
+                const desktopDropdowns = document.querySelectorAll('.dropdown');
+                desktopDropdowns.forEach(dropdown => {
+                    const link = dropdown.querySelector('a');
+                    const menu = dropdown.querySelector('.dropdown-menu');
+                    
+                    if (link && menu) {
+                        link.addEventListener('click', (e) => {
+                            // Only prevent default on mobile to allow navigation on desktop
+                            if (window.innerWidth <= 768) {
+                                e.preventDefault();
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
+    </header>
+</body>
+</html>

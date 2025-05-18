@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách bất động sản - Bất Động Sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <link href="/assets/css/style_title.css" rel="stylesheet">
+    <link href="/assets/css/header.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{header :: header}"></div>
+
+    <!-- Slider -->
+    <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active hero-can-ho">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Căn hộ cao cấp</h5>
+                    <p>Khám phá những căn hộ hiện đại tại trung tâm thành phố.</p>
+                </div>
+            </div>
+            <div class="carousel-item hero-chung-cu">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Chung cư tiện nghi</h5>
+                    <p>Không gian sống lý tưởng cho gia đình bạn.</p>
+                </div>
+            </div>
+            <div class="carousel-item hero-biet-thu">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Biệt thự sang trọng</h5>
+                    <p>Trải nghiệm phong cách sống thượng lưu.</p>
+                </div>
+            </div>
+            <div class="carousel-item hero-nha-pho">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Nhà phố hiện đại</h5>
+                    <p>Vị trí đắc địa, tiện ích vượt trội.</p>
+                </div>
+            </div>
+            <div class="carousel-item hero-van-phong">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Văn phòng chuyên nghiệp</h5>
+                    <p>Môi trường làm việc lý tưởng cho doanh nghiệp.</p>
+                </div>
+            </div>
+            <div class="carousel-item hero-dat-nen">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Đất nền tiềm năng</h5>
+                    <p>Đầu tư sinh lời với các lô đất nền vị trí đẹp.</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Trước</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Sau</span>
+        </button>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="container py-5">
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="searchForm" method="get" action="/listings">
+                            <input type="hidden" name="page" value="0">
+                            <input type="hidden" name="size" th:value="${size != null ? size : 9}">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm..." th:value="${keyword}">
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" name="propertyTypeId">
+                                        <option value="">Loại bất động sản</option>
+                                        <option th:each="type : ${propertyTypes}" 
+                                                th:value="${type.id}" 
+                                                th:text="${type.name}"
+                                                th:selected="${type.id == propertyTypeId}">
+                                            Loại bất động sản
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" name="priceRange">
+                                        <option value="">Giá</option>
+                                        <option value="1-2" th:selected="${minPrice != null && minPrice == 1000000000L}">1-2 tỷ</option>
+                                        <option value="2-5" th:selected="${minPrice != null && minPrice == 2000000000L}">2-5 tỷ</option>
+                                        <option value="5-10" th:selected="${minPrice != null && minPrice == 5000000000L}">5-10 tỷ</option>
+                                        <option value="10+" th:selected="${minPrice != null && minPrice == 10000000000L}">Trên 10 tỷ</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" name="areaRange">
+                                        <option value="">Diện tích</option>
+                                        <option value="50-100" th:selected="${minArea != null && minArea == 50}">50-100m²</option>
+                                        <option value="100-150" th:selected="${minArea != null && minArea == 100}">100-150m²</option>
+                                        <option value="150-200" th:selected="${minArea != null && minArea == 150}">150-200m²</option>
+                                        <option value="200+" th:selected="${minArea != null && minArea == 200}">Trên 200m²</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-search"></i> Tìm kiếm
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Properties Section -->
+        <section>
+            <h2 class="text-center mb-4">Bất động sản hiện có</h2>
+            <div class="row">
+                <!-- Property Cards -->
+                <div th:if="${properties != null && !properties.empty}">
+                    <div class="row">
+                        <div th:each="property : ${properties}" class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="position-absolute top-0 end-0 m-2" th:if="${property.featured}">
+                                    <span class="badge bg-danger">Nổi bật</span>
+                                </div>
+                                <img th:if="${property.fileUrl != null}" th:src="${property.fileUrl}" class="card-img-top" alt="Property Image">
+                                <img th:unless="${property.fileUrl != null}" src="/assets/images/property-default.jpg" class="card-img-top" alt="Default Property Image">
+                                <div class="card-body">
+                                    <h5 class="card-title" th:text="${property.name}">Property Name</h5>
+                                    <p class="card-text text-primary" th:text="${#numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">Price</p>
+                                    <p class="card-text">
+                                        <i class="bi bi-geo-alt"></i> <span th:text="${property.address}">Address</span><br>
+                                        <i class="bi bi-rulers"></i> <span th:text="${property.area} + 'm²'">Area</span><br>
+                                        <i class="bi bi-door-open"></i> <span th:text="${property.bedrooms != null ? property.bedrooms + ' phòng ngủ' : 'Không có thông tin'}">Bedrooms</span>
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a th:href="@{'/property/' + ${property.id}}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                                        <button class="btn btn-outline-danger btn-sm favorite-btn" th:data-id="${property.id}">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fallback when no properties found -->
+                <div th:if="${properties == null || properties.empty}" class="col-12">
+                    <div class="alert alert-info">
+                        Không có bất động sản nào phù hợp với tiêu chí tìm kiếm. Vui lòng thử lại với các điều kiện khác.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages > 0}" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/listings(page=${currentPage - 1}, size=${size}, keyword=${keyword}, propertyTypeId=${propertyTypeId}, minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea}, maxArea=${maxArea})}" tabindex="-1">Trước</a>
+                </li>
+                
+                <li class="page-item" th:each="i: ${#numbers.sequence(0, totalPages - 1)}" 
+                    th:classappend="${currentPage == i ? 'active' : ''}">
+                    <a class="page-link" th:href="@{/listings(page=${i}, size=${size}, keyword=${keyword}, propertyTypeId=${propertyTypeId}, minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea}, maxArea=${maxArea})}" th:text="${i + 1}">1</a>
+                </li>
+                
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/listings(page=${currentPage + 1}, size=${size}, keyword=${keyword}, propertyTypeId=${propertyTypeId}, minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea}, maxArea=${maxArea})}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle form submission manually
+            $("#searchForm").on("submit", function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const keyword = $(this).find("input[name=keyword]").val();
+                const propertyTypeId = $(this).find("select[name=propertyTypeId]").val();
+                const priceRange = $(this).find("select[name=priceRange]").val();
+                const areaRange = $(this).find("select[name=areaRange]").val();
+                const page = $(this).find("input[name=page]").val();
+                const size = $(this).find("input[name=size]").val();
+                
+                // Build query string
+                let queryParams = [];
+                if (keyword) queryParams.push("keyword=" + encodeURIComponent(keyword));
+                if (propertyTypeId) queryParams.push("propertyTypeId=" + propertyTypeId);
+                if (page) queryParams.push("page=" + page);
+                if (size) queryParams.push("size=" + size);
+                
+                if (priceRange) {
+                    const [minPrice, maxPrice] = priceRange.split('-');
+                    if (minPrice) queryParams.push("minPrice=" + (minPrice * 1000000000));
+                    if (maxPrice && maxPrice !== '+') queryParams.push("maxPrice=" + (maxPrice * 1000000000));
+                    if (maxPrice === '+' && minPrice) queryParams.push("minPrice=" + (minPrice * 1000000000));
+                }
+                
+                if (areaRange) {
+                    const [minArea, maxArea] = areaRange.split('-');
+                    if (minArea) queryParams.push("minArea=" + minArea);
+                    if (maxArea && maxArea !== '+') queryParams.push("maxArea=" + maxArea);
+                    if (maxArea === '+' && minArea) queryParams.push("minArea=" + minArea);
+                }
+                
+                // Redirect to search results
+                if (queryParams.length > 0) {
+                    window.location.href = "/listings?" + queryParams.join("&");
+                } else {
+                    window.location.href = "/listings";
+                }
+            });
+        });
+    </script>
+</body>
+</html>

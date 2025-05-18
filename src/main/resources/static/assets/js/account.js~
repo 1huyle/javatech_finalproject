@@ -1,0 +1,794 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra đăng nhập
+    if (!checkAuth()) {
+        return; // Không tiếp tục nếu chưa đăng nhập
+    }
+    
+    // Khởi tạo các sự kiện
+    initializeEvents();
+    
+    // Kiểm tra vai trò và điều chỉnh giao diện tương ứng
+    checkUserRole();
+    
+    // Tải dữ liệu người dùng
+    loadUserData();
+    
+    // Tải lịch sử giao dịch
+    loadTransactions();
+    
+    // Tải danh sách yêu thích
+    loadFavorites();
+    
+    // Tải cài đặt thông báo
+    loadNotificationSettings();
+});
+
+// Kiểm tra đăng nhập
+function checkAuth() {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    if (!token || !user || !user.id) {
+        // Không có token hoặc dữ liệu người dùng, chuyển hướng đến trang đăng nhập
+        window.location.href = '/login';
+        return false;
+    }
+    return true;
+}
+
+// Khởi tạo các sự kiện
+function initializeEvents() {
+    // Đăng ký sự kiện cho các tab
+    const tabs = document.querySelectorAll('.account-tab');
+    const tabContents = document.querySelectorAll('.tab-pane');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Loại bỏ active class từ tất cả tabs và tab contents
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active', 'show'));
+            
+            // Thêm active class cho tab được chọn
+            this.classList.add('active');
+            
+            // Hiển thị nội dung tab tương ứng
+            const tabContent = document.querySelector(this.getAttribute('href'));
+            if (tabContent) {
+                tabContent.classList.add('active', 'show');
+            }
+        });
+    });
+    
+    // Xử lý form cập nhật hồ sơ
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', updateProfile);
+    }
+    
+    // Xử lý form thay đổi mật khẩu
+    const passwordForm = document.getElementById('passwordForm');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', changePassword);
+    }
+}
+
+// Kiểm tra vai trò người dùng và điều chỉnh giao diện
+function checkUserRole() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const isRealtor = user.role === 'REALTOR';
+    const isAdmin = user.role === 'ADMIN';
+    
+    // Hiển thị các phần tử dựa vào vai trò
+    document.querySelectorAll('.user-only').forEach(element => {
+        element.style.display = !isRealtor && !isAdmin ? 'block' : 'none';
+    });
+    
+    document.querySelectorAll('.realtor-only').forEach(element => {
+        element.style.display = isRealtor ? 'block' : 'none';
+    });
+    
+    document.querySelectorAll('.admin-only').forEach(element => {
+        element.style.display = isAdmin ? 'block' : 'none';
+    });
+    
+    // Hiển thị badge cho REALTOR
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement && isRealtor) {
+        userNameElement.innerHTML += ' <span id="realtorBadge" class="badge bg-primary">REALTOR</span>';
+    }
+    
+    // Ẩn tab quản lý BĐS nếu không phải REALTOR
+    const realtorTab = document.getElementById('realtor-tab');
+    if (realtorTab) {
+        realtorTab.style.display = isRealtor ? 'block' : 'none';
+    }
+    
+    // Hiển thị thông báo phù hợp với vai trò
+    if (isRealtor) {
+        loadRealtorProperties();
+    } else {
+        // Tải gợi ý BĐS cho USER dựa trên danh sách yêu thích
+        loadRecommendedProperties();
+    }
+}
+
+// Tải dữ liệu người dùng
+async function loadUserData() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        // Hiển thị thông tin người dùng trong sidebar
+        const userNameElement = document.getElementById('userName');
+        if (userNameElement) {
+            userNameElement.textContent = user.firstName + ' ' + user.lastName;
+        }
+        
+        const userEmailElement = document.getElementById('userEmail');
+        if (userEmailElement) {
+            userEmailElement.textContent = user.email;
+        }
+        
+        // Điền thông tin vào form
+        const firstNameInput = document.getElementById('firstName');
+        if (firstNameInput) {
+            firstNameInput.value = user.firstName || '';
+        }
+        const lastNameInput = document.getElementById('lastName');
+        if (lastNameInput) {
+            lastNameInput.value = user.lastName || '';
+        }
+        
+        const emailInput = document.getElementById('email');
+        if (emailInput) {
+            emailInput.value = user.email || '';
+        }
+        
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.value = user.phone || '';
+        }
+        
+        const addressInput = document.getElementById('address');
+        if (addressInput) {
+            addressInput.value = user.address || '';
+        }
+        
+        const birthDateInput = document.getElementById('birthDate');
+        if (birthDateInput && user.birthDate) {
+            birthDateInput.value = user.birthDate;
+        }
+        
+        // Cập nhật avatar nếu có
+        const avatarImg = document.getElementById('userAvatar');
+        if (avatarImg && user.avatarUrl) {
+            avatarImg.src = user.avatarUrl;
+        }
+    } catch (error) {
+        console.error('Lỗi khi tải dữ liệu người dùng:', error);
+        showNotification('Không thể tải thông tin người dùng', 'error');
+    }
+}
+
+// Tải lịch sử giao dịch
+async function loadTransactions() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        const transactionsTableBody = document.getElementById('transactionsTableBody');
+        if (!transactionsTableBody) {
+            console.log('Bảng giao dịch không tồn tại trong DOM');
+            return;
+        }
+        
+        // Hiển thị thông báo đang tải
+        transactionsTableBody.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Đang tải dữ liệu...</td></tr>';
+        
+        try {
+            const res = await fetch(`/api/transactions/user/${user.id}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            
+            if (res.status === 400) {
+                // Có thể API chưa được triển khai hoặc có lỗi
+                transactionsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chức năng đang được phát triển</td></tr>';
+                return;
+            }
+            
+            if (!res.ok) throw new Error('Không thể lấy lịch sử giao dịch');
+            
+            const transactions = await res.json();
+            
+            // Xóa dữ liệu cũ
+            transactionsTableBody.innerHTML = '';
+            
+            // Kiểm tra nếu không có giao dịch
+            if (transactions.length === 0) {
+                transactionsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Bạn chưa có giao dịch nào</td></tr>';
+                return;
+            }
+        
+        // Thêm dữ liệu mới
+        transactions.forEach(transaction => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${transaction.id}</td>
+                    <td>${transaction.propertyName || 'N/A'}</td>
+                    <td>${transaction.type || 'N/A'}</td>
+                    <td>${transaction.amount ? transaction.amount.toLocaleString('vi-VN') + ' VNĐ' : 'N/A'}</td>
+                    <td><span class="badge ${getStatusClass(transaction.status)}">${transaction.status || 'N/A'}</span></td>
+                    <td>${transaction.date ? new Date(transaction.date).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                `;
+                transactionsTableBody.appendChild(row);
+            });
+        } catch (error) {
+            // Hiển thị thông báo lỗi trong bảng
+            transactionsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Không thể tải dữ liệu giao dịch</td></tr>';
+            console.error('Lỗi khi tải lịch sử giao dịch:', error);
+        }
+    } catch (error) {
+        console.error('Lỗi khi tải lịch sử giao dịch:', error);
+    }
+}
+
+// Tải danh sách yêu thích
+async function loadFavorites() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        // Tìm container hiển thị danh sách yêu thích - có thể khác nhau trong các template
+        const favoritesContainer = document.getElementById('favorites');
+        if (!favoritesContainer) {
+            console.log('Container danh sách yêu thích không tồn tại trong DOM');
+            return;
+        }
+        
+        // Hiển thị thông báo đang tải
+        favoritesContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p>Đang tải dữ liệu...</p></div>';
+        
+        try {
+            const res = await fetch(`/api/wishlists/user/${user.id}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            
+            if (res.status === 400) {
+                // Có thể API chưa được triển khai hoặc có lỗi
+                favoritesContainer.innerHTML = '<div class="alert alert-info">Chức năng đang được phát triển</div>';
+                return;
+            }
+            
+        if (!res.ok) throw new Error('Không thể lấy danh sách yêu thích');
+            
+        const favorites = await res.json();
+            
+            // Xóa dữ liệu cũ
+            favoritesContainer.innerHTML = '';
+            
+            // Tạo row để chứa các card
+            const row = document.createElement('div');
+            row.className = 'row';
+            favoritesContainer.appendChild(row);
+            
+            // Kiểm tra nếu không có yêu thích
+            if (favorites.length === 0) {
+                row.innerHTML = '<div class="col-12"><div class="alert alert-info">Bạn chưa có bất động sản yêu thích nào.</div></div>';
+                return;
+            }
+            
+            // Thêm dữ liệu mới
+            favorites.forEach(property => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-4';
+                
+                col.innerHTML = `
+                    <div class="card h-100">
+                        <img src="${property.imageUrl || '/assets/images/property-placeholder.jpg'}" class="card-img-top" alt="${property.title || 'Bất động sản'}">
+                        <div class="card-body">
+                            <h5 class="card-title">${property.title || 'Không có tiêu đề'}</h5>
+                            <p class="card-text">${property.address || 'Không có địa chỉ'}</p>
+                            <p class="card-text text-primary fw-bold">${property.price ? property.price.toLocaleString('vi-VN') + ' VNĐ' : 'Liên hệ'}</p>
+                            <a href="/listing-detail/${property.id}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                            <button class="btn btn-danger btn-sm remove-favorite" data-id="${property.id}">Xóa</button>
+                        </div>
+                    </div>
+                `;
+                
+                row.appendChild(col);
+                
+                // Thêm event listener cho nút xóa
+                const removeButton = col.querySelector('.remove-favorite');
+                if (removeButton) {
+                    removeButton.addEventListener('click', function() {
+                        removeFavorite(this.getAttribute('data-id'));
+                    });
+                }
+            });
+        } catch (error) {
+            // Hiển thị thông báo lỗi
+            favoritesContainer.innerHTML = '<div class="alert alert-danger">Không thể tải danh sách yêu thích</div>';
+            console.error('Lỗi khi tải danh sách yêu thích:', error);
+        }
+    } catch (error) {
+        console.error('Lỗi khi tải danh sách yêu thích:', error);
+    }
+}
+
+// Tải gợi ý BĐS cho USER
+async function loadRecommendedProperties() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        const res = await fetch(`/api/properties/recommendations/${user.id}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+        
+        if (!res.ok) throw new Error('Không thể lấy gợi ý bất động sản');
+        
+        const properties = await res.json();
+        const container = document.getElementById('recommendationsContainer');
+        if (!container) return;
+        
+        // Xóa dữ liệu cũ
+        container.innerHTML = '';
+        
+        // Kiểm tra nếu không có dữ liệu
+        if (properties.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">Hiện không có gợi ý nào phù hợp với bạn.</div>';
+            return;
+        }
+        
+        // Thêm dữ liệu mới
+        properties.forEach(property => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4 mb-4';
+            
+            col.innerHTML = `
+                <div class="card h-100">
+                    <img src="${property.imageUrl || '/assets/images/property-placeholder.jpg'}" class="card-img-top" alt="${property.title}">
+                    <div class="card-body">
+                        <h5 class="card-title">${property.title}</h5>
+                        <p class="card-text">${property.address}</p>
+                        <p class="card-text text-primary fw-bold">${property.price.toLocaleString('vi-VN')} VNĐ</p>
+                        <a href="/listing-detail/${property.id}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                        <button class="btn btn-outline-primary btn-sm add-favorite" data-id="${property.id}">Yêu thích</button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(col);
+            
+            // Thêm event listener cho nút yêu thích
+            col.querySelector('.add-favorite').addEventListener('click', function() {
+                addToFavorite(this.getAttribute('data-id'));
+            });
+        });
+    } catch (error) {
+        console.error('Lỗi khi tải gợi ý bất động sản:', error);
+    }
+}
+
+// Tải danh sách BĐS của REALTOR
+async function loadRealtorProperties() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        // Tìm container bảng BĐS
+        const propertiesTableBody = document.getElementById('propertiesTableBody');
+        if (!propertiesTableBody) {
+            console.log('Bảng BĐS không tồn tại trong DOM');
+            return;
+        }
+        
+        // Hiển thị thông báo đang tải
+        propertiesTableBody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Đang tải dữ liệu...</td></tr>';
+        
+        try {
+            const res = await fetch(`/api/properties/realtor/${user.id}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            
+            if (res.status === 400) {
+                // Có thể API chưa được triển khai hoặc có lỗi
+                propertiesTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Chức năng đang được phát triển</td></tr>';
+                return;
+            }
+            
+            if (!res.ok) throw new Error('Không thể lấy danh sách bất động sản');
+            
+            const properties = await res.json();
+            
+            // Xóa dữ liệu cũ
+            propertiesTableBody.innerHTML = '';
+            
+            // Kiểm tra nếu không có dữ liệu
+            if (properties.length === 0) {
+                propertiesTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Bạn chưa có bất động sản nào</td></tr>';
+                return;
+            }
+            
+            // Thêm dữ liệu mới
+            properties.forEach(property => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${property.id || 'N/A'}</td>
+                    <td><img src="${property.imageUrl || '/assets/images/property-placeholder.jpg'}" alt="${property.title || 'Bất động sản'}" class="img-thumbnail" width="50"></td>
+                    <td>${property.title || 'Không có tiêu đề'}</td>
+                    <td>${property.type || 'N/A'}</td>
+                    <td>${property.price ? property.price.toLocaleString('vi-VN') + ' VNĐ' : 'Liên hệ'}</td>
+                    <td><span class="badge ${getPropertyStatusClass(property.status)}">${property.status || 'N/A'}</span></td>
+                    <td>
+                        <a href="/listing-detail/${property.id}" class="btn btn-sm btn-info">Xem</a>
+                        <button class="btn btn-sm btn-primary edit-property" data-id="${property.id}">Sửa</button>
+                        <button class="btn btn-sm btn-danger delete-property" data-id="${property.id}">Xóa</button>
+                    </td>
+                `;
+                
+                propertiesTableBody.appendChild(row);
+                
+                // Thêm event listener cho các nút
+                const editButton = row.querySelector('.edit-property');
+                if (editButton) {
+                    editButton.addEventListener('click', function() {
+                        editProperty(this.getAttribute('data-id'));
+                    });
+                }
+                
+                const deleteButton = row.querySelector('.delete-property');
+                if (deleteButton) {
+                    deleteButton.addEventListener('click', function() {
+                        deleteProperty(this.getAttribute('data-id'));
+                    });
+                }
+            });
+        } catch (error) {
+            // Hiển thị thông báo lỗi
+            propertiesTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Không thể tải danh sách bất động sản</td></tr>';
+            console.error('Lỗi khi tải danh sách bất động sản:', error);
+        }
+    } catch (error) {
+        console.error('Lỗi khi tải danh sách bất động sản:', error);
+    }
+}
+
+// Tải cài đặt thông báo
+function loadNotificationSettings() {
+    // Implement later if needed
+}
+
+// Cập nhật thông tin cá nhân
+// async function updateProfile(e) {
+//     e.preventDefault();
+    
+//     try {
+//         const user = JSON.parse(localStorage.getItem('user'));
+//         if (!user) throw new Error('Chưa đăng nhập');
+        
+//         const formData = {
+//             firstName: document.getElementById('firstName').value,
+//             lastName: document.getElementById('lastName').value,
+//             phone: document.getElementById('phone').value,
+//             address: document.getElementById('address').value
+//         };
+        
+//         const res = await fetch(`/api/users/${user.id}`, {
+//             method: 'PUT',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': 'Bearer ' + localStorage.getItem('token')
+//             },
+//             body: JSON.stringify(formData)
+//         });
+        
+//         if (!res.ok) throw new Error('Không thể cập nhật thông tin');
+        
+//         const updatedUser = await res.json();
+        
+//         // Cập nhật thông tin người dùng trong localStorage
+//         user.firstName = updatedUser.firstName;
+//         user.lastName = updatedUser.lastName;
+//         user.phone = updatedUser.phone;
+//         user.address = updatedUser.address;
+        
+//         localStorage.setItem('user', JSON.stringify(user));
+        
+//         // Cập nhật hiển thị
+//         loadUserData();
+        
+//         // Hiển thị thông báo thành công
+//         showNotification('Cập nhật thông tin thành công', 'success');
+//     } catch (error) {
+//         console.error('Lỗi khi cập nhật thông tin:', error);
+//         showNotification('Không thể cập nhật thông tin', 'error');
+//     }
+// }
+
+function validateProfileForm(formData) {
+    const errors = [];
+    if (!formData.firstName || formData.firstName.trim().length < 1) {
+        errors.push('Họ là bắt buộc.');
+    }
+    if (!formData.lastName || formData.lastName.trim().length < 1) {
+        errors.push('Tên là bắt buộc.');
+    }
+    if (!formData.phone || !/^\d{5,15}$/.test(formData.phone)) {
+        errors.push('Số điện thoại không hợp lệ (5-15 chữ số).');
+    }
+    if (!formData.address || formData.address.trim().length < 1) {
+        errors.push('Địa chỉ là bắt buộc.');
+    }
+    if (formData.birthDate && isNaN(new Date(formData.birthDate).getTime())) {
+        errors.push('Ngày sinh không hợp lệ.');
+    }
+    return errors;
+}
+async function updateProfile(e) {
+    e.preventDefault();
+    
+    const form = document.getElementById('profileForm');
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        const formData = {
+            firstName: document.getElementById('firstName').value.trim(),
+            lastName: document.getElementById('lastName').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            address: document.getElementById('address').value.trim(),
+            birthDate: document.getElementById('birthDate').value || null,
+            email: user.email // Gửi email từ user để tránh lỗi @NotBlank
+        };
+
+        const errors = validateProfileForm(formData);
+        if (errors.length > 0) {
+            showNotification(errors.join(' '), 'error');
+            return;
+        }
+
+        const res = await fetch(`/api/users/${user.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!res.ok) {
+            if (res.status === 400) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Dữ liệu không hợp lệ');
+            } else if (res.status === 401) {
+                throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            } else {
+                throw new Error('Không thể cập nhật thông tin');
+            }
+        }
+
+        const updatedUser = await res.json();
+        user.firstName = updatedUser.firstName;
+        user.lastName = updatedUser.lastName;
+        user.phone = updatedUser.phone;
+        user.address = updatedUser.address;
+        user.birthDate = updatedUser.birthDate;
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        loadUserData();
+        showNotification('Cập nhật thông tin thành công', 'success');
+        form.classList.remove('was-validated');
+    } catch (error) {
+        console.error('Lỗi khi cập nhật thông tin:', error);
+        showNotification(error.message || 'Không thể cập nhật thông tin', 'error');
+    }
+}
+
+// Thay đổi mật khẩu
+async function changePassword(e) {
+    e.preventDefault();
+    
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        // Kiểm tra mật khẩu mới và xác nhận
+        if (newPassword !== confirmPassword) {
+            showNotification('Mật khẩu xác nhận không khớp', 'error');
+        return;
+    }
+        
+        const res = await fetch('/api/auth/change-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: `userId=${user.id}&oldPassword=${encodeURIComponent(currentPassword)}&newPassword=${encodeURIComponent(newPassword)}`
+        });
+        
+        if (!res.ok) throw new Error('Không thể thay đổi mật khẩu');
+        
+        // Xóa form
+        document.getElementById('passwordForm').reset();
+        
+        // Hiển thị thông báo thành công
+        showNotification('Thay đổi mật khẩu thành công', 'success');
+    } catch (error) {
+        console.error('Lỗi khi thay đổi mật khẩu:', error);
+        showNotification('Không thể thay đổi mật khẩu', 'error');
+    }
+}
+
+// Xóa khỏi danh sách yêu thích
+async function removeFavorite(propertyId) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        const res = await fetch(`/api/wishlists/remove`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                userId: user.id,
+                propertyId: propertyId
+            })
+        });
+        
+        if (!res.ok) throw new Error('Không thể xóa khỏi danh sách yêu thích');
+        
+        // Tải lại danh sách
+        loadFavorites();
+        
+        // Hiển thị thông báo
+        showNotification('Đã xóa khỏi danh sách yêu thích', 'success');
+    } catch (error) {
+        console.error('Lỗi khi xóa khỏi danh sách yêu thích:', error);
+        showNotification('Không thể xóa khỏi danh sách yêu thích', 'error');
+    }
+}
+
+// Thêm vào danh sách yêu thích
+async function addToFavorite(propertyId) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        const res = await fetch(`/api/wishlists/add`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                userId: user.id,
+                propertyId: propertyId
+            })
+        });
+        
+        if (!res.ok) throw new Error('Không thể thêm vào danh sách yêu thích');
+        
+        // Tải lại danh sách
+        loadRecommendedProperties();
+        
+        // Hiển thị thông báo
+        showNotification('Đã thêm vào danh sách yêu thích', 'success');
+    } catch (error) {
+        console.error('Lỗi khi thêm vào danh sách yêu thích:', error);
+        showNotification('Không thể thêm vào danh sách yêu thích', 'error');
+    }
+}
+
+// Xóa bất động sản
+async function deleteProperty(propertyId) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) throw new Error('Chưa đăng nhập');
+        
+        // Xác nhận xóa
+        if (!confirm('Bạn có chắc chắn muốn xóa bất động sản này không?')) {
+            return;
+        }
+        
+        const res = await fetch(`/api/properties/${propertyId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+        
+        if (!res.ok) throw new Error('Không thể xóa bất động sản');
+        
+        // Tải lại danh sách
+        loadRealtorProperties();
+        
+        // Hiển thị thông báo
+        showNotification('Đã xóa bất động sản thành công', 'success');
+    } catch (error) {
+        console.error('Lỗi khi xóa bất động sản:', error);
+        showNotification('Không thể xóa bất động sản', 'error');
+    }
+}
+
+// Hiển thị thông báo
+function showNotification(message, type = 'info') {
+    const alertContainer = document.getElementById('alert-container');
+    if (!alertContainer) return;
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    alertContainer.appendChild(alert);
+    
+    // Tự động xóa sau 3 giây
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => {
+            alert.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Lấy class cho trạng thái giao dịch
+function getStatusClass(status) {
+    switch (status) {
+        case 'COMPLETED':
+            return 'bg-success';
+        case 'PENDING':
+            return 'bg-warning';
+        case 'CANCELLED':
+            return 'bg-danger';
+        default:
+            return 'bg-secondary';
+    }
+}
+
+// Lấy class cho trạng thái bất động sản
+function getPropertyStatusClass(status) {
+    switch (status) {
+        case 'AVAILABLE':
+            return 'bg-success';
+        case 'PENDING':
+            return 'bg-warning';
+        case 'SOLD':
+            return 'bg-danger';
+        case 'RENTED':
+            return 'bg-info';
+        default:
+            return 'bg-secondary';
+    }
+}
+
+// Hàm sửa BĐS (placeholder)
+function editProperty(id) {
+    console.log('Sửa BĐS:', id);
+    // Hiển thị modal hoặc redirect đến trang sửa
+    alert('Chức năng đang được phát triển: Sửa BĐS ID ' + id);
+} 

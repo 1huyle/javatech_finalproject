@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết yêu cầu mua bất động sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background: #facc15;
+            border-radius: 2px;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #facc15;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
+        }
+        .btn-primary {
+            background: #facc15;
+            border: none;
+            color: #1e3a8a;
+            font-weight: 600;
+            border-radius: 9999px;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #eab308;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{header :: header}"></div>
+
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Chi tiết yêu cầu mua bất động sản</h1>
+            <div>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/orders}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+                <a sec:authorize="!hasRole('ADMIN')" th:href="@{/account}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row">
+            <!-- Thông tin yêu cầu -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Thông tin yêu cầu #<span th:text="${purchaseRequest.id}"></span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Trạng thái:</strong></p>
+                                <span th:class="'badge ' + 
+                                    (${purchaseRequest.status.name() == 'PENDING'} ? 'bg-warning text-dark' : 
+                                    (${purchaseRequest.status.name() == 'COMPLETED'} ? 'bg-success' : 
+                                    (${purchaseRequest.status.name() == 'CANCELLED'} ? 'bg-secondary' : 'bg-danger')))"
+                                      th:text="${purchaseRequest.status.name() == 'PENDING' ? 'Đang chờ xử lý' : 
+                                            (purchaseRequest.status.name() == 'COMPLETED' ? 'Hoàn thành' : 
+                                            (purchaseRequest.status.name() == 'CANCELLED' ? 'Đã hủy' : 'Không xác định'))}">
+                                </span>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Ngày tạo:</strong></p>
+                                <p th:text="${#temporals.format(purchaseRequest.createdAt, 'dd/MM/yyyy HH:mm')}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Khách hàng:</strong></p>
+                                <p th:text="${purchaseRequest.user.fullName + ' (' + purchaseRequest.user.email + ')'}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Ngày dự kiến:</strong></p>
+                                <p th:text="${#temporals.format(purchaseRequest.expectedDate, 'dd/MM/yyyy')}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Bất động sản:</strong></p>
+                                <p>
+                                    <a th:href="@{/property/{id}(id=${purchaseRequest.property.id})}" target="_blank" 
+                                       th:text="${purchaseRequest.property.name}"></a>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Môi giới viên:</strong></p>
+                                <p th:if="${purchaseRequest.assignedRealtor != null}" 
+                                   th:text="${purchaseRequest.assignedRealtor.fullName}"></p>
+                                <p th:if="${purchaseRequest.assignedRealtor == null}" class="text-muted">Chưa phân công</p>
+                            </div>
+                        </div>
+
+                        <hr>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Giá mua:</strong></p>
+                                <p class="text-primary fw-bold" th:text="${#numbers.formatDecimal(purchaseRequest.purchasePrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Phương thức thanh toán:</strong></p>
+                                <p th:text="${purchaseRequest.paymentMethod.name() == 'CASH' ? 'Tiền mặt' : 
+                                             (purchaseRequest.paymentMethod.name() == 'BANK_TRANSFER' ? 'Chuyển khoản ngân hàng' : 
+                                             (purchaseRequest.paymentMethod.name() == 'LOAN' ? 'Vay ngân hàng' : 
+                                             (purchaseRequest.paymentMethod.name() == 'CREDIT_CARD' ? 'Thẻ tín dụng' : 
+                                             (purchaseRequest.paymentMethod.name() == 'INSTALLMENT' ? 'Trả góp' : 'Không xác định'))))}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3" th:if="${purchaseRequest.paymentMethod.name() == 'LOAN'}">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Số tiền vay:</strong></p>
+                                <p th:text="${purchaseRequest.loanAmount != null ? #numbers.formatDecimal(purchaseRequest.loanAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'N/A'}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Thời hạn vay:</strong></p>
+                                <p th:text="${purchaseRequest.loanTerm != null ? purchaseRequest.loanTerm + ' năm' : 'N/A'}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Hoa hồng:</strong></p>
+                                <p th:text="${#numbers.formatDecimal(purchaseRequest.commissionAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ (' + purchaseRequest.commissionRate + '%)'}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Cho phép thương lượng:</strong></p>
+                                <p th:text="${purchaseRequest.isNegotiable ? 'Có' : 'Không'}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" th:if="${purchaseRequest.note != null && !purchaseRequest.note.isEmpty()}">
+                            <p class="mb-1"><strong>Ghi chú khách hàng:</strong></p>
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-0" th:text="${purchaseRequest.note}"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" th:if="${purchaseRequest.adminNote != null && !purchaseRequest.adminNote.isEmpty()}">
+                            <p class="mb-1"><strong>Ghi chú quản trị viên:</strong></p>
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-0" th:text="${purchaseRequest.adminNote}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hành động -->
+            <div class="col-md-4">
+                <!-- Cập nhật trạng thái sang Hủy bỏ -->
+                <div class="card mb-4" sec:authorize="hasRole('REALTOR')"
+                     th:if="${purchaseRequest.status.name() == 'PENDING'}">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">Hủy yêu cầu</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/transactions/{id}/status(id=${purchaseRequest.id})}" method="post">
+                            <input type="hidden" name="status" value="CANCELLED" />
+                            <div class="mb-3">
+                                <label for="cancelNote" class="form-label">Lý do hủy (Ghi chú)</label>
+                                <textarea id="cancelNote" name="note" class="form-control" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100">Xác nhận hủy yêu cầu</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Hoàn thành giao dịch -->
+                <div class="card mb-4" sec:authorize="hasRole('REALTOR')"
+                     th:if="${purchaseRequest.status.name() == 'PENDING'}">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Hoàn thành giao dịch</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/transactions/purchase/{id}/complete(id=${purchaseRequest.id})}" method="post">
+                            <p>Xác nhận hoàn thành yêu cầu mua này. Hành động này sẽ cập nhật trạng thái bất động sản và tạo giao dịch liên quan.</p>
+                            <!-- Có thể thêm trường nhập ghi chú hoàn thành nếu cần -->
+                            <button type="submit" class="btn btn-success w-100">Xác nhận hoàn thành</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-4" 
+                     th:if="${purchaseRequest.status.name() == 'COMPLETED' || purchaseRequest.status.name() == 'CANCELLED'}">
+                     <div class="card-header"
+                          th:classappend="${purchaseRequest.status.name() == 'COMPLETED' ? 'bg-success text-white' : 'bg-secondary text-white'}">
+                        <h5 class="mb-0">Thông tin trạng thái</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-0">
+                            Yêu cầu này đã ở trạng thái 
+                            <strong th:text="${purchaseRequest.status.name() == 'COMPLETED' ? 'HOÀN THÀNH' : 'ĐÃ HỦY'}"></strong>.
+                            <span th:if="${purchaseRequest.completedAt}" 
+                                  th:text="' vào lúc ' + ${#temporals.format(purchaseRequest.completedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                            <span th:if="${purchaseRequest.cancelledAt}" 
+                                  th:text="' vào lúc ' + ${#temporals.format(purchaseRequest.cancelledAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+</body>
+</html> 

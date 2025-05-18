@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tìm kiếm và thuê bất động sản tại TP.HCM. Khám phá căn hộ, nhà phố, biệt thự và đất nền với giá tốt nhất.">
+    <meta name="keywords" content="thuê bất động sản, căn hộ, nhà phố, biệt thự, đất nền, TP.HCM, Việt Nam">
+    <meta name="author" content="Bất Động Sản">
+    <title>Thuê bất động sản - Bất Động Sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/sale-style.css" rel="stylesheet">
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <link href="/assets/css/header.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="container py-5" aria-labelledby="listing-title">
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card fade-in">
+                    <div class="card-body">
+                        <h2 class="section-title" id="listing-title">Tìm kiếm bất động sản cho thuê</h2>
+                        <form id="searchForm" method="get" action="/rentals">
+                            <input type="hidden" name="page" value="0">
+                            <input type="hidden" name="size" th:value="${size != null ? size : 9}">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="searchInput" name="keyword" th:value="${keyword}" placeholder="Tìm kiếm..." aria-describedby="searchFeedback">
+                                    <div id="searchFeedback" class="invalid-feedback">Vui lòng nhập từ khóa tìm kiếm.</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="propertyType" name="propertyType" aria-label="Loại bất động sản">
+                                        <option value="">Loại bất động sản</option>
+                                        <option value="Căn hộ" th:selected="${propertyType == 'Căn hộ'}">Căn hộ</option>
+                                        <option value="Nhà phố" th:selected="${propertyType == 'Nhà phố'}">Nhà phố</option>
+                                        <option value="Biệt thự" th:selected="${propertyType == 'Biệt thự'}">Biệt thự</option>
+                                        <option value="Đất nền" th:selected="${propertyType == 'Đất nền'}">Đất nền</option>
+                                        <option value="Văn phòng" th:selected="${propertyType == 'Văn phòng'}">Văn phòng</option>
+                                        <option value="Chung cư" th:selected="${propertyType == 'Chung cư'}">Chung cư</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="priceRange" name="priceRange" aria-label="Giá">
+                                        <option value="">Giá (VNĐ/tháng)</option>
+                                        <option value="0-10" th:selected="${priceRange == '0-10'}">Dưới 10 triệu</option>
+                                        <option value="10-20" th:selected="${priceRange == '10-20'}">10 - 20 triệu</option>
+                                        <option value="20-30" th:selected="${priceRange == '20-30'}">20 - 30 triệu</option>
+                                        <option value="30-50" th:selected="${priceRange == '30-50'}">30 - 50 triệu</option>
+                                        <option value="50+" th:selected="${priceRange == '50+'}">Trên 50 triệu</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="areaRange" name="areaRange" aria-label="Diện tích">
+                                        <option value="">Diện tích</option>
+                                        <option value="50-100" th:selected="${areaRange == '50-100'}">50-100m²</option>
+                                        <option value="100-150" th:selected="${areaRange == '100-150'}">100-150m²</option>
+                                        <option value="150-200" th:selected="${areaRange == '150-200'}">150-200m²</option>
+                                        <option value="200+" th:selected="${areaRange == '200+'}">Trên 200m²</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary w-100" id="searchSubmit">
+                                        <span id="searchSubmitText"><i class="bi bi-search me-2"></i>Tìm kiếm</span>
+                                        <span id="searchLoadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <!-- Sorting options -->
+                        <div class="mt-3 d-flex justify-content-end">
+                            <div class="btn-group">
+                                <a th:href="@{/rentals(page=0, size=${size}, sortBy='createdAt', direction='desc')}" 
+                                   class="btn btn-sm" th:classappend="${sortField == 'createdAt' && sortDir == 'desc' ? 'btn-primary' : 'btn-outline-primary'}">
+                                    Mới nhất
+                                </a>
+                                <a th:href="@{/rentals(page=0, size=${size}, sortBy='price', direction='asc')}" 
+                                   class="btn btn-sm" th:classappend="${sortField == 'price' && sortDir == 'asc' ? 'btn-primary' : 'btn-outline-primary'}">
+                                    Giá: Thấp đến cao
+                                </a>
+                                <a th:href="@{/rentals(page=0, size=${size}, sortBy='price', direction='desc')}" 
+                                   class="btn btn-sm" th:classappend="${sortField == 'price' && sortDir == 'desc' ? 'btn-primary' : 'btn-outline-primary'}">
+                                    Giá: Cao đến thấp
+                                </a>
+                                <a th:href="@{/rentals(page=0, size=${size}, sortBy='area', direction='desc')}" 
+                                   class="btn btn-sm" th:classappend="${sortField == 'area' && sortDir == 'desc' ? 'btn-primary' : 'btn-outline-primary'}">
+                                    Diện tích lớn nhất
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property List -->
+        <div class="row" id="propertyList">
+            <!-- Property Cards -->
+            <div th:if="${properties.empty}" class="col-12 text-center py-5">
+                <p class="text-muted">Không tìm thấy bất động sản nào phù hợp với tiêu chí tìm kiếm.</p>
+            </div>
+            
+            <div th:each="property : ${properties}" class="col-md-4 mb-4">
+                <div class="card h-100 property-card fade-in">
+                    <div class="position-absolute top-0 end-0 m-2" th:if="${property.featured}">
+                        <span class="badge bg-danger">Nổi bật</span>
+                    </div>
+                    <img th:if="${property.fileUrl}" th:src="${property.fileUrl}" class="card-img-top" th:alt="${property.name}" loading="lazy">
+                    <img th:unless="${property.fileUrl}" src="/assets/images/property-default.jpg" class="card-img-top" th:alt="${property.name}" loading="lazy">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${property.name}">Căn hộ cao cấp Quận 1</h5>
+                        <p class="card-text text-primary" th:text="${#numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ/tháng'">2.500.000.000 VNĐ</p>
+                        <p class="card-text">
+                            <i class="bi bi-geo-alt me-1"></i> <span th:text="${property.address}">Quận 1, TP.HCM</span><br>
+                            <i class="bi bi-rulers me-1"></i> <span th:text="${property.area + 'm²'}">100m²</span><br>
+                            <i class="bi bi-door-open me-1"></i> <span th:text="${property.bedrooms + ' phòng ngủ'}" th:if="${property.bedrooms != null}">3 phòng ngủ</span>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a th:href="@{'/property/' + ${property.id}}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                            <button class="btn btn-outline-danger btn-sm favorite-btn" th:data-id="${property.id}">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages > 0}" class="mt-4 fade-in">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}" id="prevPage">
+                    <a class="page-link" th:href="@{/rentals(page=${currentPage - 1}, size=${size}, sortBy=${sortField}, direction=${sortDir}, keyword=${keyword}, propertyType=${propertyType}, priceRange=${priceRange}, areaRange=${areaRange})}" tabindex="-1" aria-label="Trang trước">Trước</a>
+                </li>
+                
+                <li class="page-item" th:each="i: ${#numbers.sequence(0, totalPages - 1)}" 
+                    th:classappend="${currentPage == i ? 'active' : ''}" th:data-page="${i + 1}">
+                    <a class="page-link" th:href="@{/rentals(page=${i}, size=${size}, sortBy=${sortField}, direction=${sortDir}, keyword=${keyword}, propertyType=${propertyType}, priceRange=${priceRange}, areaRange=${areaRange})}" th:text="${i + 1}">1</a>
+                </li>
+                
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}" id="nextPage">
+                    <a class="page-link" th:href="@{/rentals(page=${currentPage + 1}, size=${size}, sortBy=${sortField}, direction=${sortDir}, keyword=${keyword}, propertyType=${propertyType}, priceRange=${priceRange}, areaRange=${areaRange})}" aria-label="Trang sau">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="toast-header">
+            <strong class="me-auto">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle form submission manually
+            $("#searchForm").on("submit", function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const keyword = $(this).find("input[name=keyword]").val();
+                const propertyType = $(this).find("select[name=propertyType]").val();
+                const priceRange = $(this).find("select[name=priceRange]").val();
+                const areaRange = $(this).find("select[name=areaRange]").val();
+                const page = $(this).find("input[name=page]").val();
+                const size = $(this).find("input[name=size]").val();
+                
+                // Show loading spinner
+                const submitText = $('#searchSubmitText');
+                const loadingSpinner = $('#searchLoadingSpinner');
+                submitText.addClass('d-none');
+                loadingSpinner.removeClass('d-none');
+                
+                // Build query string
+                let queryParams = [];
+                if (keyword) queryParams.push("keyword=" + encodeURIComponent(keyword));
+                if (propertyType) queryParams.push("propertyType=" + encodeURIComponent(propertyType));
+                if (page) queryParams.push("page=" + page);
+                if (size) queryParams.push("size=" + size);
+                
+                // Add sort parameters
+                const sortBy = $("input[name=sortBy]").val() || "createdAt";
+                const direction = $("input[name=direction]").val() || "desc";
+                queryParams.push("sortBy=" + sortBy);
+                queryParams.push("direction=" + direction);
+                
+                if (priceRange) {
+                    const [minPriceStr, maxPriceStr] = priceRange.split('-');
+                    const millionMultiplier = 1000000; // For rentals, prices are in millions
+
+                    if (minPriceStr && !isNaN(parseFloat(minPriceStr))) {
+                        queryParams.push("minPrice=" + (parseFloat(minPriceStr) * millionMultiplier));
+                    }
+                    
+                    if (maxPriceStr && maxPriceStr !== '+' && !isNaN(parseFloat(maxPriceStr))) {
+                        queryParams.push("maxPrice=" + (parseFloat(maxPriceStr) * millionMultiplier));
+                    } else if (maxPriceStr === '+' && minPriceStr && !isNaN(parseFloat(minPriceStr))) {
+                        // For "X+" range, only minPrice is set (effectively minPrice to infinity)
+                        // queryParams.push("minPrice=" + (parseFloat(minPriceStr) * millionMultiplier)); // Already added
+                    }
+                }
+                
+                if (areaRange) {
+                    const [minArea, maxArea] = areaRange.split('-');
+                    if (minArea) queryParams.push("minArea=" + minArea);
+                    if (maxArea && maxArea !== '+') queryParams.push("maxArea=" + maxArea);
+                    if (maxArea === '+' && minArea) queryParams.push("minArea=" + minArea);
+                }
+                
+                // Redirect to search results
+                if (queryParams.length > 0) {
+                    window.location.href = "/rentals?" + queryParams.join("&");
+                } else {
+                    window.location.href = "/rentals";
+                }
+            });
+            
+            // Favorite button handling
+            $('.favorite-btn').on('click', function() {
+                const propertyId = $(this).attr('data-id');
+                const icon = $(this).find('i');
+                
+                if (icon.hasClass('bi-heart')) {
+                    icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+                    
+                    // Show toast
+                    const toast = new bootstrap.Toast($('.toast'));
+                    $('.toast-body').text('Đã thêm vào danh sách yêu thích!');
+                    toast.show();
+                } else {
+                    icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+                    
+                    // Show toast
+                    const toast = new bootstrap.Toast($('.toast'));
+                    $('.toast-body').text('Đã xóa khỏi danh sách yêu thích!');
+                    toast.show();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

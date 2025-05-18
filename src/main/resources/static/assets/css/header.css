@@ -1,0 +1,114 @@
+.header {
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.nav-link {
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #333333; 
+}
+.nav-link:hover {
+    color: #3B82F6; 
+    transform: translateY(0);
+}
+.logo img {
+    transition: transform 0.3s ease;
+}
+.logo img:hover {
+    transform: scale(1.1);
+}
+.dropdown {
+    position: relative;
+}
+.dropdown-menu {
+    transition: all 0.3s ease;
+    transform: translateY(10px);
+    opacity: 0;
+    visibility: hidden;
+    display: block;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    z-index: 1000;
+    min-width: 220px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding-top: 15px;
+    margin-top: -5px;
+}
+.dropdown:hover .dropdown-menu {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+.dropdown-menu a {
+    padding: 0.75rem 1.5rem;
+    color: #1f2937;
+    transition: background 0.2s ease;
+}
+.dropdown-menu a:hover {
+    background: #f3f4f6;
+    color: #3b82f6;
+}
+.search-bar {
+    transition: all 0.3s ease;
+}
+.search-bar input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+}
+.cta-button {
+    background: #3b82f6;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+}
+.cta-button:hover {
+    background: #2563eb;
+    transform: scale(1.05);
+}
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+    }
+    .nav-menu.active {
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        background: #f9fafb;
+        transform: none;
+        opacity: 1;
+        visibility: hidden;
+        display: none;
+        min-width: 100%;
+        padding-top: 0;
+        margin-top: 0;
+    }
+    .dropdown-menu.active {
+        display: block;
+        visibility: visible;
+    }
+    .search-bar {
+        display: none;
+    }
+    .cta-button {
+        margin: 1rem;
+        text-align: center;
+    }
+}

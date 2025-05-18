@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thông báo: Bất động sản đã bị vô hiệu hóa</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <p th:text="'Kính gửi ' + ${realtorName} + ','"></p>
+    
+    <p>
+        Bất động sản <strong th:text="${propertyName}"></strong> (ID: <span th:text="${propertyId}"></span>) 
+        của bạn đã bị vô hiệu hóa bởi quản trị viên.
+    </p>
+    
+    <p>
+        <strong>Địa chỉ:</strong> <span th:text="${propertyAddress}"></span>
+    </p>
+    
+    <p>
+        Vui lòng liên hệ với quản trị viên để biết thêm chi tiết hoặc để được hỗ trợ kích hoạt lại bất động sản.
+    </p>
+    
+    <p>
+        Bạn có thể xem thông tin tài khoản của mình tại: <a th:href="${accountUrl}" th:text="${accountUrl}"></a>
+    </p>
+    
+    <p>Trân trọng,<br />Hệ thống Real Estate</p>
+</body>
+</html> 

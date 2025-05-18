@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="vi" th:lang="${property.languageCode != null ? property.languageCode : 'vi'}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" th:content="${property != null && property.description != null ? property.description : 'Chi tiết bất động sản'}">
+    <meta name="keywords" content="bất động sản, căn hộ, nhà phố, biệt thự, đất nền">
+    <meta name="author" content="Bất Động Sản">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" th:content="@{'/property/' + ${property != null ? property.id : '0'}}">
+    <meta property="og:title" th:content="${property != null && property.name != null ? property.name : 'Chi tiết bất động sản'}">
+    <meta property="og:description" th:content="${property != null && property.description != null ? property.description : 'Chi tiết bất động sản'}">
+    <meta property="og:image" th:content="${property != null && property.fileUrl != null ? property.fileUrl : '/assets/images/property-default.jpg'}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" th:content="@{'/property/' + ${property != null ? property.id : '0'}}">
+    <meta property="twitter:title" th:content="${property != null && property.name != null ? property.name : 'Chi tiết bất động sản'}">
+    <meta property="twitter:description" th:content="${property != null && property.description != null ? property.description : 'Chi tiết bất động sản'}">
+    <meta property="twitter:image" th:content="${property != null && property.fileUrl != null ? property.fileUrl : '/assets/images/property-default.jpg'}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" th:href="@{'/property/' + ${property != null ? property.id : '0'}}">
+    
+    <title th:text="${property != null && property.name != null ? property.name + ' - Bất Động Sản' : 'Chi tiết bất động sản - Bất Động Sản'}">Chi tiết bất động sản - Bất Động Sản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background: #facc15;
+            border-radius: 2px;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #facc15;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
+        }
+        .btn-primary {
+            background: #facc15;
+            border: none;
+            color: #1e3a8a;
+            font-weight: 600;
+            border-radius: 9999px;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #eab308;
+            transform: scale(1.05);
+        }
+        .carousel-item img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            aspect-ratio: 16 / 9;
+            border-radius: 8px;
+        }
+        .similar-property img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            aspect-ratio: 4 / 3;
+            border-radius: 8px;
+        }
+        .agent-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            border: 2px solid #facc15;
+        }
+        .map-container {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+        @media (max-width: 768px) {
+            .carousel-item img {
+                height: 250px;
+            }
+            .similar-property img {
+                height: 120px;
+            }
+            .map-container {
+                height: 300px;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+            .agent-img {
+                width: 80px;
+                height: 80px;
+            }
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "RealEstateListing",
+        "name": "Chi tiết bất động sản",
+        "description": "Thông tin chi tiết về bất động sản tại Việt Nam",
+        "image": "/assets/images/property-default.jpg",
+        "price": "Liên hệ",
+        "priceCurrency": "VND"
+    }
+    </script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage"></div>
+
+    <!-- Header -->
+    <div th:replace="header :: header"></div>
+
+    <!-- Main Content -->
+    <main class="container my-5" aria-labelledby="property-title">
+        <!-- Property Details -->
+        <div class="row">
+            <!-- Left Column - Property Images and Details -->
+            <div class="col-md-8">
+                <!-- Image Gallery -->
+                <div class="card mb-4 fade-in position-relative">
+                    <div class="card-body p-0">
+                        <div id="propertyGallery" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <!-- Show fileUrl as main image if available -->
+                                <div class="carousel-item active">
+                                    <img th:src="${property != null && property.fileUrl != null ? property.fileUrl : '/assets/images/property-default.jpg'}" 
+                                         class="d-block w-100" th:alt="${property != null && property.name != null ? property.name : 'Bất động sản'}" loading="lazy">
+                                </div>
+                                <!-- Fallback if no images found -->
+                                <div th:if="${property == null || (property.fileUrl == null && (property.images == null || property.images.empty))}" class="carousel-item">
+                                    <img src="/assets/images/property-default.jpg" class="d-block w-100" alt="Hình ảnh mặc định" loading="lazy">
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#propertyGallery" data-bs-slide="prev" aria-label="Ảnh trước">
+                                <span class="carousel-control-prev-icon"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#propertyGallery" data-bs-slide="next" aria-label="Ảnh sau">
+                                <span class="carousel-control-next-icon"></span>
+                            </button>
+                        </div>
+                        <button class="btn btn-outline-danger favorite-btn" id="favoriteBtn">
+                            <i class="bi bi-heart" id="favoriteIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Property Information -->
+                <div class="card mb-4 fade-in">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h1 class="section-title" id="propertyTitle" th:text="${property != null && property.name != null ? property.name : 'Bất động sản'}">Căn hộ cao cấp Quận 1</h1>
+                            <div>
+                                <span th:if="${property != null && property.featured != null && property.featured}" class="badge bg-warning me-2">Nổi bật</span>
+                                <span class="badge bg-success" th:text="${property != null && property.status != null ? property.status : 'Đang bán'}">Còn hàng</span>
+                                <span th:if="${property != null && property.transactionType != null}" 
+                                      th:class="${property.transactionType.name() == 'SALE' ? 'badge bg-primary' : 'badge bg-info'}"
+                                      th:text="${property.transactionType.name() == 'SALE' ? 'Bán' : 'Cho thuê'}">Bán</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="property-price" id="propertyPrice">
+                                <span th:if="${property != null && property.price != null}" 
+                                      th:text="${#numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ' + 
+                                               (property != null && property.transactionType != null && property.transactionType.name() == 'RENTAL' ? 
+                                               '/' + (property.rentalPeriod != null ? property.rentalPeriod : 'tháng') : '')}">
+                                    10.000.000.000 VNĐ
+                                </span>
+                                <span th:unless="${property != null && property.price != null}">Liên hệ</span>
+                            </h2>
+                            <div class="d-flex">
+                                <button th:if="${property != null && property.transactionType != null && property.transactionType.name() == 'RENTAL'}" 
+                                      th:attr="data-property-id=${property.id}" class="btn btn-warning me-2 transaction-btn" data-transaction-type="lease">
+                                    <i class="bi bi-house-add me-1"></i> Thuê ngay
+                                </button>
+                                <button th:if="${property != null && property.transactionType != null && property.transactionType.name() == 'SALE'}" 
+                                      th:attr="data-property-id=${property.id}" class="btn btn-warning me-2 transaction-btn" data-transaction-type="purchase">
+                                    <i class="bi bi-house-check me-1"></i> Mua ngay
+                                </button>
+                                <button class="btn btn-primary" id="contactButton">
+                                    <i class="bi bi-telephone me-1"></i> Liên hệ
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><strong>Địa chỉ:</strong> <span id="propertyAddress" th:text="${property != null && property.address != null ? property.address : 'Chưa cập nhật'}">Quận 1, TP.HCM</span></li>
+                                    <li><strong>Diện tích:</strong> <span id="propertyArea" th:text="${property != null && property.area != null ? property.area + ' m²' : 'Chưa cập nhật'}">100m²</span></li>
+                                    <li><strong>Số phòng ngủ:</strong> <span id="propertyBedrooms" th:text="${property != null && property.bedrooms != null ? property.bedrooms : 'Không có thông tin'}">3</span></li>
+                                    <li th:if="${property != null && property.transactionType != null && property.transactionType.name() == 'RENTAL'}">
+                                        <strong>Kỳ hạn thuê:</strong>
+                                        <span th:text="${property.rentalPeriod != null ? property.rentalPeriod : 'Tháng'}">Tháng</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><strong>Số phòng tắm:</strong> <span id="propertyBathrooms" th:text="${property != null && property.bathrooms != null ? property.bathrooms : 'Không có thông tin'}">2</span></li>
+                                    <li><strong>Năm xây dựng:</strong> <span id="propertyYear" th:text="${property != null && property.yearBuilt != null ? property.yearBuilt : 'Không có thông tin'}">2020</span></li>
+                                    <li><strong>Loại bất động sản:</strong> <span id="propertyType" th:text="${property != null && property.propertyType != null && property.propertyType.name != null ? property.propertyType.name : 'Không rõ'}">Căn hộ</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <h3 class="section-title">Mô tả</h3>
+                        <p id="propertyDescription" th:text="${property != null && property.description != null ? property.description : 'Chưa có mô tả'}">Căn hộ cao cấp tại trung tâm Quận 1, thiết kế hiện đại, đầy đủ tiện nghi, gần các tiện ích như trung tâm thương mại, trường học, bệnh viện.</p>
+
+                        <!-- Transaction Information - Thông tin giao dịch -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h3 class="section-title">Thông tin giao dịch</h3>
+                                <ul class="list-unstyled">
+                                    <li><strong>Loại giao dịch:</strong> 
+                                        <span th:text="${property != null && property.transactionType != null ? 
+                                                      (property.transactionType.name() == 'SALE' ? 'Bán' : 'Cho thuê') : 'Không xác định'}">
+                                            Bán
+                                        </span>
+                                    </li>
+                                    <li><strong>Giá:</strong> 
+                                        <span class="text-primary" th:text="${property != null && property.price != null ? 
+                                                                           #numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ' + 
+                                                                           (property != null && property.transactionType != null && property.transactionType.name() == 'RENTAL' ? 
+                                                                           '/' + (property.rentalPeriod != null ? property.rentalPeriod : 'tháng') : '') : 'Liên hệ'}">
+                                            10.000.000.000 VNĐ
+                                        </span>
+                                    </li>
+                                    <li><strong>Phí môi giới:</strong> 
+                                        <span th:text="${property != null && property.commissionRate != null ? 
+                                                      property.commissionRate + '% (' + #numbers.formatDecimal(property.getCommissionAmount(), 0, 'COMMA', 0, 'POINT') + ' VNĐ)' : '5%'}">
+                                            5% (50.000.000 VNĐ)
+                                        </span>
+                                    </li>
+                                    <li><strong>Trạng thái:</strong> 
+                                        <span th:text="${property != null && property.status != null ? property.status : 'Không xác định'}" 
+                                              th:class="${property != null && property.status != null ? 
+                                                        (property.status == T(com.example.demo.model.enums.PropertyStatus).AVAILABLE ? 'text-success' : 
+                                                        (property.status == T(com.example.demo.model.enums.PropertyStatus).SOLD ? 'text-danger' : 
+                                                        (property.status == T(com.example.demo.model.enums.PropertyStatus).RENTED ? 'text-warning' : 'text-muted'))) : 'text-muted'}">
+                                            Còn trống
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Location Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h3 class="section-title">Vị trí</h3>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-geo-alt text-primary me-2"></i>
+                                    <span th:text="${property != null && property.address != null ? property.address : 'Chưa cập nhật'}">Quận 1, TP.HCM</span>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        Tọa độ: 
+                                        <span th:text="${property != null && property.latitude != null ? property.latitude : '10.776389'}">10.776389</span>, 
+                                        <span th:text="${property != null && property.longitude != null ? property.longitude : '106.698079'}">106.698079</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Features -->
+                <div class="card mb-4 fade-in">
+                    <div class="card-body">
+                        <h3 class="section-title">Tính năng</h3>
+                        <div class="row" id="propertyFeatures">
+                            <!-- Chỉ hiển thị các tính năng mặc định vì không có thuộc tính features trong model -->
+                            <div class="col-md-6 mb-2">
+                                <i class="bi bi-check-circle text-primary me-2"></i>
+                                <span>Bãi đỗ xe</span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                    <i class="bi bi-check-circle text-primary me-2"></i>
+                                <span>Hệ thống an ninh</span>
+                                </div>
+                            <div class="col-md-6 mb-2">
+                                <i class="bi bi-check-circle text-primary me-2"></i>
+                                <span>Sân vườn</span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <i class="bi bi-check-circle text-primary me-2"></i>
+                                <span>Nội thất</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Section -->
+                <div class="card mb-4 fade-in">
+                    <div class="card-body p-0">
+                        <h3 class="section-title p-3">Bản đồ</h3>
+                        <div class="map-container">
+                            <iframe
+                                th:src="${'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.447264002246!2d' + (property != null && property.longitude != null ? property.longitude : '106.698079') + '!3d' + (property != null && property.latitude != null ? property.latitude : '10.776389') + '!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38e4a8c1cb%3A0x5c50e7c8b4b6d6f!2sQu%E1%BA%ADn+1%2C+Ho+Chi+Minh+City%2C+Vietnam!5e0!3m2!1svi!2s!4v1698765432109!5m2!1svi!2s'}"
+                                width="100%"
+                                height="100%"
+                                style="border:0;"
+                                allowfullscreen=""
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Contact Form and Agent Info -->
+            <div class="col-md-4">
+                <!-- Contact Form -->
+                <div class="card mb-4 fade-in">
+                    <div class="card-body">
+                        <h3 class="section-title">Liên hệ người môi giới</h3>
+                        <form id="contactForm" novalidate>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" id="name" required aria-describedby="nameFeedback">
+                                <div id="nameFeedback" class="invalid-feedback">Vui lòng nhập họ và tên.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" required aria-describedby="emailFeedback">
+                                <div id="emailFeedback" class="invalid-feedback">Vui lòng nhập email hợp lệ.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="phone" required pattern="\+84\d{9,10}|\d{10}" aria-describedby="phoneFeedback">
+                                <div id="phoneFeedback" class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Tin nhắn</label>
+                                <textarea class="form-control" id="message" rows="4" required minlength="10" aria-describedby="messageFeedback"></textarea>
+                                <div id="messageFeedback" class="invalid-feedback">Vui lòng nhập tin nhắn (tối thiểu 10 ký tự).</div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary" id="contactSubmit">
+                                    <span id="contactSubmitText"><i class="bi bi-send me-2"></i>Gửi tin nhắn</span>
+                                    <span id="contactLoadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Agent Information -->
+                <div class="card mb-4 fade-in" th:if="${property.realtor != null}">
+                    <div class="card-body">
+                        <h3 class="section-title">Thông tin người môi giới</h3>
+                        <div class="text-center mb-3">
+                            <img src="/assets/images/avatar-default.jpg" alt="Ảnh đại diện người môi giới" class="agent-img">
+                            <h4 id="agentName" th:text="${(property.realtor != null) ? ((property.realtor.firstName != null ? property.realtor.firstName : '') + ' ' + (property.realtor.lastName != null ? property.realtor.lastName : '')) : 'Người môi giới'}">Nguyễn Văn An</h4>
+                            <p id="agentTitle" class="text-muted">Chuyên viên bất động sản</p>
+                        </div>
+                        <ul class="list-unstyled">
+                            <li><strong>Điện thoại:</strong> <a th:href="${(property.realtor != null && property.realtor.phone != null) ? 'tel:' + property.realtor.phone : '#'}" th:text="${(property.realtor != null && property.realtor.phone != null) ? property.realtor.phone : 'Không có thông tin'}" id="agentPhone" class="text-primary">0901234567</a></li>
+                            <li><strong>Email:</strong> <a th:href="${(property.realtor != null && property.realtor.email != null) ? 'mailto:' + property.realtor.email : '#'}" th:text="${(property.realtor != null && property.realtor.email != null) ? property.realtor.email : 'Không có thông tin'}" id="agentEmail" class="text-primary">an.nguyen@example.com</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Similar Properties -->
+                <div class="card fade-in">
+                    <div class="card-body">
+                        <h3 class="section-title">Bất động sản tương tự</h3>
+                        <div id="similarProperties">
+                            <!-- When we have similar properties from backend -->
+                            <div th:if="${similarProperties != null && !similarProperties.empty}" class="row">
+                                <div th:each="similarProperty : ${similarProperties}" class="col-md-6 mb-3">
+                                    <div class="similar-property">
+                                        <img th:src="${similarProperty != null && similarProperty.fileUrl != null ? similarProperty.fileUrl : '/assets/images/property-default.jpg'}"
+                                             class="img-fluid rounded" th:alt="${similarProperty != null && similarProperty.name != null ? similarProperty.name : 'Bất động sản'}" loading="lazy">
+                                        <h5 class="mt-2" th:text="${similarProperty != null && similarProperty.name != null ? similarProperty.name : 'Bất động sản'}">Tên bất động sản</h5>
+                                        <p class="text-primary" th:text="${similarProperty != null && similarProperty.price != null ? #numbers.formatDecimal(similarProperty.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : 'Liên hệ'}">Giá</p>
+                                        <a th:href="${similarProperty != null ? '/property/' + similarProperty.id : '#'}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Placeholder content when no similar properties -->
+                            <div th:if="${similarProperties == null || similarProperties.empty}" class="alert alert-info">
+                                Không tìm thấy bất động sản tương tự.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="toast-header">
+            <strong class="me-auto">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="footer :: footer"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/property-detail.js"></script>
+    <script>
+        // Wrapper an toàn để tránh conflict với extensions
+        (function() {
+            try {
+                // Initialize AOS
+                AOS.init({
+                    duration: 800,
+                    once: true
+                });
+
+                // Hide loading overlay immediately
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                $(document).ready(function() {
+                    try {
+                        // Get property ID from URL path segment rather than query parameter
+                        const pathSegments = window.location.pathname.split('/');
+                        const propertyId = pathSegments[pathSegments.length - 1];
+                        
+                        // Show error message
+                        function showError(message) {
+                            const errorMessage = $('#errorMessage');
+                            errorMessage.text(message).fadeIn();
+                            setTimeout(() => errorMessage.fadeOut(), 5000);
+                        }
+                        
+                        // Show success toast message
+                        function showToast(message) {
+                            const toast = $('.toast');
+                            const toastBody = $('.toast-body');
+                            toastBody.text(message);
+                            toast.toast('show');
+                        }
+                        
+                        // Simplified favorite button functionality
+                        $('#favoriteBtn').on('click', function() {
+                                showToast('Vui lòng đăng nhập để sử dụng tính năng này');
+                        });
+
+                        // Contact form validation and submission
+                        $('#contactForm').on('submit', function(event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            const form = this;
+                            if (form.checkValidity()) {
+                                const pathSegments = window.location.pathname.split('/');
+                                const propertyId = pathSegments[pathSegments.length - 1];
+                                
+                                const contactData = {
+                                    name: $('#name').val(),
+                                    email: $('#email').val(),
+                                    phone: $('#phone').val(),
+                                    message: $('#message').val()
+                                };
+
+                                const submitButton = $('#contactSubmit');
+                                const submitText = $('#contactSubmitText');
+                                const loadingSpinner = $('#contactLoadingSpinner');
+
+                                // Show loading state
+                                submitButton.prop('disabled', true);
+                                submitText.addClass('d-none');
+                                loadingSpinner.removeClass('d-none');
+
+                                $.ajax({
+                                    url: `/property/${propertyId}/contact-realtor`,
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(contactData),
+                                    success: function(response) {
+                                        showToast(response.message || 'Tin nhắn đã được gửi thành công!');
+                                        form.reset();
+                                        $(form).removeClass('was-validated');
+                                    },
+                                    error: function(xhr) {
+                                        const errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Gửi tin nhắn thất bại. Vui lòng thử lại.';
+                                        showError(errorMsg);
+                                    },
+                                    complete: function() {
+                                        // Hide loading state
+                                        submitButton.prop('disabled', false);
+                                        submitText.removeClass('d-none');
+                                        loadingSpinner.addClass('d-none');
+                                    }
+                                });
+                            } else {
+                                $(form).addClass('was-validated');
+                                showError('Vui lòng điền đầy đủ và chính xác các thông tin được yêu cầu.');
+                            }
+                        });
+                        
+                        // Format phone number input
+                        $('#phone').on('input', function() {
+                            let value = this.value.replace(/\D/g, '');
+                            if (value.length > 11) value = value.slice(0, 11);
+                            this.value = value;
+                        });
+
+                        // Xử lý nút mua/thuê bất động sản
+                        $('.transaction-btn').on('click', function() {
+                            try {
+                                const propertyId = $(this).data('property-id');
+                                
+                                // Chuyển hướng trực tiếp đến trang giao dịch purchase, form này sẽ xử lý cả mua và thuê
+                                window.location.href = `/property/${propertyId}/purchase`;
+                                
+                            } catch (e) {
+                                console.error("Lỗi khi xử lý nút giao dịch:", e);
+                                showToast('Có lỗi xảy ra. Vui lòng thử lại sau.');
+                            }
+                        });
+                    } catch (e) {
+                        console.error("Lỗi trong document.ready:", e);
+                    }
+                });
+                
+                // Fallback to ensure loading is hidden even if document.ready fails
+                window.onload = function() {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                };
+
+                // Script để kiểm tra xác thực
+                document.addEventListener('DOMContentLoaded', function() {
+                    try {
+                        // Ẩn loading overlay để đảm bảo trang luôn hiển thị đúng
+                        if (document.getElementById('loadingOverlay')) {
+                            document.getElementById('loadingOverlay').style.display = 'none';
+                        }
+                    } catch (e) {
+                        console.error("Lỗi trong DOMContentLoaded:", e);
+                    }
+                });
+            } catch (e) {
+                console.error("Lỗi chung:", e);
+                // Đảm bảo ẩn loading overlay ngay cả khi có lỗi
+                if (document.getElementById('loadingOverlay')) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

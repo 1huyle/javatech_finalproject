@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Đăng nhập vào hệ thống bất động sản để tìm kiếm và quản lý các bất động sản chất lượng cao.">
+    <title>Đăng nhập - Bất Động Sản</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/assets/css/login-style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Form -->
+    <main class="login-container">
+        <div class="login-form" data-aos="fade-up">
+            <!-- Logo -->
+            <div class="text-center">
+                <img src="/assets/images/logo.png" alt="Bất Động Sản Logo" class="logo">
+            </div>
+            <h2>ĐĂNG NHẬP</h2>
+            <div id="loginError" class="alert alert-danger text-center mt-2 d-none" role="alert"></div>
+            <div id="verificationSuccess" class="alert alert-success text-center mt-2 d-none" role="alert">
+                Xác thực email thành công! Vui lòng đăng nhập.
+            </div>
+            <div id="verificationError" class="alert alert-danger text-center mt-2 d-none" role="alert">
+                Xác thực email thất bại. Vui lòng thử lại.
+            </div>
+            <div id="loginRequired" class="alert alert-info text-center mt-2 d-none" role="alert">
+                Vui lòng đăng nhập để tiếp tục giao dịch mua bất động sản.
+            </div>
+            <form id="loginForm">
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu" required>
+                    <button type="button" class="toggle-password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="form-check">
+                    <div>
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Ghi nhớ tôi</label>
+                    </div>
+                    <a href="/forgot-password" class="forget-password">Quên mật khẩu?</a>
+                </div>
+                <button type="submit" class="btn-signin">ĐĂNG NHẬP</button>
+                <div class="register-link">
+                    Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
+                </div>
+            </form>
+            <div class="divider">— Hoặc đăng nhập bằng —</div>
+            <div class="social-buttons">
+                <button type="button" class="btn-social">
+                    <i class="fab fa-facebook-f me-2"></i> Facebook
+                </button>
+                <button type="button" class="btn-social">
+                    <i class="fab fa-google me-2"></i> Google    
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({ duration: 1000 });
+
+        // Check verification status
+        const urlParams = new URLSearchParams(window.location.search);
+        const verified = urlParams.get('verified');
+        const error = urlParams.get('error');
+        const required = urlParams.get('required');
+        
+        if (verified === 'true') {
+            document.getElementById('verificationSuccess').classList.remove('d-none');
+        } else if (error === 'verification_failed') {
+            document.getElementById('verificationError').classList.remove('d-none');
+        } else if (required === 'true') {
+            document.getElementById('loginRequired').classList.remove('d-none');
+        }
+
+        // Toggle Password Visibility
+        $('.toggle-password').click(function() {
+            const passwordInput = $('#password');
+            const icon = $(this).find('i');
+            if (passwordInput.attr('type') === 'password') {
+                passwordInput.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordInput.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+        
+        // Define redirectToAccount function needed by header.html (if header is used)
+        function redirectToAccount() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = '/account';
+            } else {
+                // We're already on the login page
+                // No need to redirect
+            }
+        }
+    </script>
+</body>
+</html>

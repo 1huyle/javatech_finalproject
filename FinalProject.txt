@@ -1,0 +1,46 @@
+﻿TON DUC THANG UNIVERSITY
+Faculty of Information Technology
+
+Course: Java Technology
+Final Project
+Overview
+The real estate market is defined by the transactions of both residential properties and commercial properties. Typical residential properties are houses and apartments. Commercial properties include office buildings and industrial properties. Besides of property sales, leases of apartments and houses are a part of the market.
+Proptech, short for property technology, is the intersection of the real estate industry and software technology. There are many successful companies in this sector like Zillow ( https://www.zillow.com/ ) and Trulia ( https:// www.trulia.com/ ). These companies help connect buyers and sellers, landlords and renters, thus, generate billions of dollars of transactions annually.
+In Vietnam, proptech is still in its early phase of development. Although many startups are well funded by wealthy investors, they are failed to facilitate the operations of the real estate market. Batdongsan (https://batdongsan.com.vn/) is one of the few survivors in this highly competitive and emerging market.
+In this project, you will build a web-based platform to support the operations of the real estate business.
+
+Business Requirements
+The system is decomposed into 5 main services: Listing Service, Sales Service, Rental Service, Payment Service and Security (User / Authentication) Service.
+
+Listing Service takes care of all the activities related to the listings which are the posts of the properties in the website. The realtors (real estate agents) can
+
+upload and modify the information of the properties including id, name, address (location), the sales or rental price. The users (buyers, renters) can view the information of the listings in the website and then make the decisions to come and see, buy or rent the properties.
+
+The Sales Service is in charge of all activities related to sales transactions. The realtors work with the buyers and other parties to close the sales. The Sales Service should handle the steps in the procedure and store all information in the system.
+
+The Rental Service helps the renters view all the available apartments and offices in the regions. The renters can contact the realtors to make the contacts to rent the properties. All the information in the process should be stored in the system.
+
+Each transaction in the system would contribute a commission to the proptech company. The Payment Service manage all financial operations in the platform.
+
+The Security Service guarantees that all the operations in the platform are conducted in a safe and secure manner. The Security Service can provide user management feature as well as the authentication and authorization services.
+
+Technical Requirements
+
+1. Build a system based on Java Spring Boot framework to perform all operations stated above. You can refer to the operations of the mentioned successful companies. The data of the system should be stored in MySQL or Postgres DBMS. The images of listings, realtors, users could be stored in NOSQL database (MongoDB). The frontend could be developed by Spring Thymeleaf or any other popular technologies like React or Angular.
+2. Each service should be implemented as a web service to provide APIs to perform CRUD operations on the data of listings, users, transactions, etc.
+3. An acceptable amount of unit tests should be covered.
+4. A project report includes:
+
+• Analysis and Design: explanation for software development principles, patterns and practices being applied. Include all class diagrams, entity-
+
+relationship database diagrams, use cases, and solution diagrams for the components, infrastructure design if any.
+
+• Implementation: explanation for the code structure, technologies used in the project.
+
+• Deployment: All required steps in order to get the application run on a local computer. It would be a plus if you can deploy your application to Docker, Kubernetes or real website hosting service.
+
+• Web Service: full Postman snapshots to verify the APIs including request endpoints, HTTP Headers and request payload if any.
+• User Interface: present all functionalities of your website.
+5. Provide a demo video to show all nice features of your proptech platform.
+6. Provide architecture of the whole platform, preferably to apply Micro- services architecture. Each service could be designed and implemented using Domain Driven Design (DDD) principles.
+7. Apply new technologies for handling communication between services. You are recommended to use message broker like RabbitMQ.

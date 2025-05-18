@@ -1,0 +1,78 @@
+
+/* Custom styles for modern look */
+body {
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 2rem;
+}
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 50%;
+    height: 4px;
+    background: #facc15;
+    border-radius: 2px;
+}
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.core-value-icon {
+    transition: transform 0.3s ease;
+}
+.core-value-icon:hover {
+    transform: scale(1.2);
+}
+.team-carousel .carousel-item img {
+    border-radius: 12px;
+    object-fit: cover;
+    height: 300px;
+}
+.cta-button {
+    background: #facc15;
+    color: #1e3a8a;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+}
+.cta-button:hover {
+    background: #eab308;
+    transform: scale(1.05);
+}
+.stats-section {
+    background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+    color: white;
+    padding: 3rem 0;
+    border-radius: 12px;
+}
+.stats-item {
+    text-align: center;
+}
+.stats-item h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2rem;
+    }
+    .stats-item h3 {
+        font-size: 2rem;
+    }
+}

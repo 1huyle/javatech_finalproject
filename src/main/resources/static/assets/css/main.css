@@ -1,0 +1,44 @@
+.footer {
+    background: #212529;
+    color: #ccc;
+    font-size: 15px;
+  }
+  
+  .footer h5 {
+    color: #fff;
+    font-weight: 600;
+  }
+  
+  .footer a {
+    color: #ccc;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 8px;
+    transition: color 0.3s;
+  }
+  
+  .footer a:hover {
+    color: #0d6efd; /* màu xanh dương nhạt của Bootstrap */
+  }
+  
+  .footer .footer-contact li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .footer .footer-contact i {
+    margin-right: 8px;
+    color: #0d6efd;
+  }
+  
+  /* Responsive đẹp hơn */
+  @media (max-width: 767.98px) {
+    .footer {
+      text-align: center;
+    }
+    .footer .row > div {
+      margin-bottom: 20px;
+    }
+  }
+  

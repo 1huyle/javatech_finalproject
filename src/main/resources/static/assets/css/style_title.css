@@ -1,0 +1,110 @@
+/* Dùng chung cho tất cả tiêu đề */
+.hero-section {
+    background-size: cover;
+    background-position: center;
+    height: 550px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Chữ trong hero */
+.hero-section h1 {
+    font-size: 2.5rem;
+    background-color: rgba(0, 0, 0, 0.5); /* nền mờ */
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+.card-text {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+.btn-outline-primary {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+@media (max-width: 576px) {
+    .card-img-top {
+        height: 150px;
+    }
+    .card-title {
+        font-size: 1.1rem;
+    }
+    .card-text {
+        font-size: 0.85rem;
+    }
+}
+
+/* Ảnh nền cho từng loại */
+.hero-can-ho {
+    background-image: url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914');
+}
+
+.hero-chung-cu {
+    background-image: url('https://images.unsplash.com/photo-1570129477492-45c003edd2be');
+}
+
+.hero-biet-thu {
+    background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c');
+}
+
+.hero-nha-pho {
+    background-image: url('https://images.unsplash.com/photo-1730404691983-cc26f90b4f46?q=80&w=2006&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+}
+
+.hero-van-phong {
+    background-image: url('https://plus.unsplash.com/premium_photo-1670315264879-59cc6b15db5f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+}
+
+.hero-dat-nen {
+    background-image: url('https://plus.unsplash.com/premium_photo-1661963324980-5a3a9ca16b4b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+}
+
+.carousel-item {
+    height: 550px;
+    background-size: cover;
+    background-position: center;
+}
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+}
+.hero-can-ho {
+    background-image: url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914');
+}
+.hero-chung-cu {
+    background-image: url('https://images.unsplash.com/photo-1570129477492-45c003edd2be');
+}
+.hero-biet-thu {
+    background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c');
+}
+.hero-nha-pho {
+    background-image: url('https://images.unsplash.com/photo-1730404691983-cc26f90b4f46?q=80&w=2006&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+}
+.hero-van-phong {
+    background-image: url('https://plus.unsplash.com/premium_photo-1670315264879-59cc6b15db5f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+}
+.hero-dat-nen {
+    background-image: url('https://plus.unsplash.com/premium_photo-1661963324980-5a3a9ca16b4b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+}

@@ -1,0 +1,96 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+}
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+.form-control, .form-select {
+    border-radius: 8px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #facc15;
+    box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
+}
+.btn-primary {
+    background: #facc15;
+    border: none;
+    color: #1e3a8a;
+    font-weight: 600;
+    border-radius: 9999px;
+    padding: 0.75rem 2rem;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    background: #eab308;
+    transform: scale(1.05);
+}
+.list-group-item.active {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+}
+.fade-in {
+    animation: fadeIn 1s ease-in;
+}
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+.favorite-card {
+    transition: transform 0.3s ease;
+}
+.favorite-card:hover {
+    transform: scale(1.05);
+}
+.avatar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+#userAvatar {
+    object-fit: cover;
+    border: 2px solid #facc15;
+}
+@media (max-width: 768px) {
+    .sidebar {
+        margin-bottom: 1rem;
+    }
+    .list-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .list-group-item {
+        flex: 1 1 45%;
+        text-align: center;
+    }
+}
+
+/* CSS cho các class user-only và realtor-only để đảm bảo ẩn ban đầu */
+.user-only,
+.realtor-only {
+    display: none;
+}
+
+/* Badge cho REALTOR */
+#realtorBadge {
+    font-size: 0.75rem;
+    vertical-align: middle;
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Thanh toán thành công cho giao dịch bất động sản tại Việt Nam. Xem chi tiết giao dịch và khám phá thêm các bất động sản chất lượng.">
+    <meta name="keywords" content="thanh toán thành công, bất động sản, mua bán nhà đất, Việt Nam">
+    <meta name="author" content="Bất Động Sản">
+    <title>Thanh toán thành công - Real Estate</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/account.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background: #facc15;
+            border-radius: 2px;
+        }
+        .btn-primary {
+            background: #facc15;
+            border: none;
+            color: #1e3a8a;
+            font-weight: 600;
+            border-radius: 9999px;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #eab308;
+            transform: scale(1.05);
+        }
+        .btn-outline-primary {
+            border-color: #1e3a8a;
+            color: #1e3a8a;
+            border-radius: 9999px;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-primary:hover {
+            background: #1e3a8a;
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .transaction-details {
+            background: #e6f3ff;
+            border-radius: 8px;
+            transition: opacity 0.5s ease;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .security-notice {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+            .card-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="header :: header"></div>
+
+    <!-- Main Content -->
+    <main class="container my-5" aria-labelledby="success-title">
+        <div class="row justify-content-centermakepost
+            <div class="col-md-8">
+                <div class="card fade-in">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                        </div>
+                        <h1 id="success-title" class="section-title">Thanh toán thành công!</h1>
+                        <p class="card-text mb-4 text-gray-600">Cảm ơn bạn đã tin tưởng và mua bất động sản qua Real Estate. Đội ngũ của chúng tôi sẽ liên hệ với bạn trong vòng <strong>24 giờ</strong> để hỗ trợ các bước tiếp theo.</p>
+                        
+                        <div class="transaction-details p-4 mb-4">
+                            <h5 class="mb-3 fw-semibold">Chi tiết giao dịch</h5>
+                            <div class="row text-start">
+                                <div class="col-md-6 mb-3">
+                                    <p><strong>Mã giao dịch:</strong> <span id="transactionId">TXN123456</span></p>
+                                    <p><strong>Ngày giao dịch:</strong> <span id="transactionDate">05/11/2024</span></p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <p><strong>Tên bất động sản:</strong> <span id="propertyName">Căn hộ cao cấp Quận 1</span></p>
+                                    <p><strong>Số tiền:</strong> <span id="amount">2.550.000.000 VNĐ</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="security-notice mb-4 p-3">
+                            <h6 class="fw-semibold"><i class="bi bi-shield-lock-fill text-primary me-2"></i>Bảo mật giao dịch</h6>
+                            <p class="text-gray-600 mb-0">Mọi thông tin thanh toán của bạn được bảo vệ bởi mã hóa SSL 256-bit, đảm bảo an toàn tuyệt đối.</p>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-center">
+                            <a href="../pages/listings.html" class="btn btn-primary me-md-2"><i class="fa fa-building me-2"></i>Khám phá thêm bất động sản</a>
+                            <a href="../pages/index.html" class="btn btn-outline-primary"><i class="fa fa-home me-2"></i>Về trang chủ</a>
+                        </div>
+
+                        <div class="mt-4">
+                            <p class="text-muted">Cần hỗ trợ ngay? Liên hệ qua <a href="tel:+84288888888" class="text-primary">+84 28 8888 8888</a> hoặc <a href="mailto:support@realestate.vn" class="text-primary">support@realestate.vn</a>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="footer :: footer"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Load header and footer
+            $("#header").load("../templates/header.html", function() {
+                console.log("Header loaded successfully");
+            });
+            $("#footer").load("../templates/footer.html", function() {
+                console.log("Footer loaded successfully");
+            });
+
+            // Show welcome toast
+            const toast = $('.toast');
+            const toastBody = $('.toast-body');
+            toastBody.text('Chúc mừng! Giao dịch của bạn đã hoàn tất thành công.');
+            toast.toast('show');
+        });
+    </script>
+</body>
+</html>

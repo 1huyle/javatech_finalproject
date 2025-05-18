@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cập nhật trạng thái yêu cầu</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <p th:text="'Chào ' + ${userName} + ','"></p>
+    <p>
+        Yêu cầu <strong th:text="${requestTypeDisplay}"></strong> của bạn cho bất động sản <strong th:text="${property.name}"></strong> 
+        đã được cập nhật trạng thái thành: <strong th:text="${requestStatusDisplay}"></strong>.
+    </p>
+    <p th:if="${adminNote != null and !#strings.isEmpty(adminNote)}">
+        Ghi chú từ quản trị viên: <em th:text="${adminNote}"></em>
+    </p>
+    <p>
+        Bạn có thể xem chi tiết yêu cầu của mình tại: <a th:href="${requestDetailsLink}" th:text="${requestDetailsLink}"></a>
+    </p>
+    <p>Trân trọng,<br />Đội ngũ Real Estate</p>
+</body>
+</html> 

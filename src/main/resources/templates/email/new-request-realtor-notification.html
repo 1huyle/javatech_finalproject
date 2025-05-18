@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thông báo yêu cầu mới</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <p th:text="'Kính gửi ' + ${realtorName} + ','"></p>
+    <p>
+        Bạn có một yêu cầu <strong th:text="${requestTypeDisplay}"></strong> mới cho bất động sản 
+        <strong th:text="${property.name}"></strong> (ID: <span th:text="${property.id}"></span>).
+    </p>
+    <p>
+        Người dùng: <span th:text="${user.firstName} + ' ' + ${user.lastName}"></span> (<span th:text="${user.email}"></span>)
+    </p>
+    <p th:if="${requestNote != null and !#strings.isEmpty(requestNote)}">
+        Ghi chú từ khách hàng: <em th:text="${requestNote}"></em>
+    </p>
+    <p>
+        Xem chi tiết yêu cầu tại: <a th:href="${requestDetailsLink}" th:text="${requestDetailsLink}"></a>
+    </p>
+    <p>Trân trọng,<br />Hệ thống Real Estate</p>
+</body>
+</html> 

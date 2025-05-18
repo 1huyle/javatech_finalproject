@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hệ thống quản lý bất động sản dành cho admin">
+    <title>Quản lý bất động sản - Admin</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link href="/assets/css/admin.css" rel="stylesheet">
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+</head>
+<body>
+    <div th:replace="~{admin/header :: header}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div th:replace="~{admin/sidebar :: sidebar(active='properties')}"></div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 col-lg-10 ms-sm-auto px-md-4">
+                <!-- Toggle Sidebar Button (Mobile) -->
+                <button class="btn btn-dark d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar" aria-expanded="false" aria-controls="sidebar">
+                    <i class="bi bi-list"></i> Menu
+                </button>
+
+                <!-- Header -->
+                <header class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Quản lý bất động sản</h2>
+                </header>
+
+                <!-- Alert thông báo lỗi nếu có -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Lỗi!</strong> <span th:text="${error}">Đã xảy ra lỗi.</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Filters -->
+                <section class="card mb-4">
+                    <div class="card-body">
+                        <form class="row g-3" id="filterForm" action="/admin/properties" method="get">
+                            <input type="hidden" name="page" value="0" id="pageInput">
+                            <input type="hidden" name="size" th:value="${pageSize}" id="pageSizeInput">
+                            
+                            <div class="col-md-3">
+                                <label for="searchInput" class="form-label">Tìm kiếm</label>
+                                <input type="text" class="form-control" id="searchInput" name="search" 
+                                       placeholder="Tên, địa chỉ..." aria-describedby="searchInputHelp"
+                                       th:value="${param.search != null ? param.search : ''}">
+                                <small id="searchInputHelp" class="form-text text-muted">Nhập tên hoặc địa chỉ bất động sản</small>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="typeFilter" class="form-label">Loại</label>
+                                <select class="form-select" id="typeFilter" name="type" aria-label="Lọc theo loại bất động sản">
+                                    <option value="">Tất cả</option>
+                                    <option th:each="type : ${propertyTypes}" 
+                                            th:value="${type.name.toLowerCase()}" 
+                                            th:text="${type.name}"
+                                            th:selected="${param.type != null && param.type[0] == type.name.toLowerCase()}">Loại bất động sản</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="statusFilter" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="statusFilter" name="status" aria-label="Lọc theo trạng thái">
+                                    <option value="">Tất cả</option>
+                                    <option value="available" th:selected="${param.status != null && param.status[0] == 'available'}">Đang bán/Cho thuê</option>
+                                    <option value="sold" th:selected="${param.status != null && param.status[0] == 'sold'}">Đã bán</option>
+                                    <option value="rented" th:selected="${param.status != null && param.status[0] == 'rented'}">Đã thuê</option>
+                                    <option value="inactive" th:selected="${param.status != null && param.status[0] == 'inactive'}">Vô hiệu hóa</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="priceFilter" class="form-label">Giá</label>
+                                <select class="form-select" id="priceFilter" name="price" aria-label="Lọc theo giá">
+                                    <option value="">Tất cả</option>
+                                    <option value="0-1" th:selected="${param.price != null && param.price[0] == '0-1'}">Dưới 1 tỷ</option>
+                                    <option value="1-2" th:selected="${param.price != null && param.price[0] == '1-2'}">1-2 tỷ</option>
+                                    <option value="2-5" th:selected="${param.price != null && param.price[0] == '2-5'}">2-5 tỷ</option>
+                                    <option value="5-10" th:selected="${param.price != null && param.price[0] == '5-10'}">5-10 tỷ</option>
+                                    <option value="10+" th:selected="${param.price != null && param.price[0] == '10+'}">Trên 10 tỷ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex gap-2 align-items-center">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="bi bi-search me-2"></i> Lọc
+                                </button>
+                                <a href="/admin/properties" class="btn btn-outline-secondary btn-sm" aria-label="Xóa bộ lọc">
+                                    <i class="bi bi-x"></i>
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Properties Table -->
+                <section class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <label for="rowsPerPage" class="form-label me-2">Hiển thị:</label>
+                                <select id="rowsPerPage" class="form-select w-auto" aria-label="Số dòng mỗi trang">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" aria-label="Danh sách bất động sản">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID <i class="bi bi-sort-alpha-down"></i></th>
+                                        <th scope="col">Hình ảnh</th>
+                                        <th scope="col">Tên</th>
+                                        <th scope="col">Địa chỉ</th>
+                                        <th scope="col">Giá</th>
+                                        <th scope="col">Loại</th>
+                                        <th scope="col">Trạng thái</th>
+                                        <th scope="col">Ngày đăng</th>
+                                        <th scope="col">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${propertiesPage == null or propertiesPage.empty}">
+                                        <td colspan="9" class="text-center">Không có bất động sản nào.</td>
+                                    </tr>
+                                    <tr th:each="property : ${propertiesPage.content}">
+                                        <td th:text="${property.id}">#P001</td>
+                                        <td>
+                                            <!-- Assuming first image is primary or a placeholder if no images -->
+                                            <img th:if="${property.images != null && !property.images.isEmpty()}" 
+                                                 th:src="@{${property.images[0].imageUrl}}" 
+                                                 th:alt="${property.name}" 
+                                                 class="property-image img-thumbnail" width="50">
+                                            <i th:if="${property.images == null || property.images.isEmpty()}" 
+                                               class="bi bi-house-fill text-secondary" style="font-size: 2rem;"></i>
+                                        </td>
+                                        <td th:text="${property.name}">Căn hộ cao cấp Quận 1</td>
+                                        <td th:text="${property.address}">123 Đường ABC, Quận 1, TP.HCM</td>
+                                        <td th:text="${#numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">2.500.000.000 VNĐ</td>
+                                        <td th:text="${property.propertyType?.name}">Căn hộ</td>
+                                        <td>
+                                            <span class="badge"
+                                                  th:with="statusStr=${property.status != null ? property.status.name() : ''},
+                                                          isAdminDeactivated=${property.adminDeactivated != null && property.adminDeactivated == true},
+                                                          isRealtorDeleted=${property.realtorDeleted != null && property.realtorDeleted == true}"
+                                                  th:classappend="${statusStr == 'AVAILABLE' ? 'bg-success' :
+                                                                  (statusStr == 'PENDING' ? 'bg-warning text-dark' :
+                                                                  (statusStr == 'SOLD' ? 'bg-info' :
+                                                                  (statusStr == 'RENTED' ? 'bg-info' :
+                                                                  ((statusStr == 'INACTIVE' && isAdminDeactivated) ? 'bg-danger' :
+                                                                  ((statusStr == 'INACTIVE' && isRealtorDeleted) ? 'bg-secondary' :
+                                                                  (statusStr == 'INACTIVE' ? 'bg-secondary' : 'bg-light text-dark'))))))}"
+                                                  th:text="${statusStr == 'INACTIVE' && isAdminDeactivated ? 'VÔ HIỆU HÓA (ADMIN)' : 
+                                                          (statusStr == 'INACTIVE' && isRealtorDeleted ? 'VÔ HIỆU HÓA (REALTOR)' : 
+                                                          property.status)}">Đang bán</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(property.createdAt, 'dd/MM/yyyy')}">15/04/2024</td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Thao tác với bất động sản">
+                                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#viewPropertyModal" th:attr="data-property-id=${property.id}" aria-label="Xem chi tiết bất động sản">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button th:if="${property.status != null && property.status.name() == 'AVAILABLE' && property.realtorDeleted != true}" class="btn btn-sm btn-outline-warning" th:attr="data-property-id=${property.id}" onclick="confirmDeactivateProperty(this.getAttribute('data-property-id'))" aria-label="Vô hiệu hóa bất động sản">
+                                                    <i class="bi bi-ban"></i>
+                                                </button>
+                                                <button th:if="${property.status != null && property.status.name() == 'INACTIVE' && property.adminDeactivated == true && property.realtorDeleted != true}" class="btn btn-sm btn-outline-success" th:attr="data-property-id=${property.id}" onclick="confirmReactivateProperty(this.getAttribute('data-property-id'))" aria-label="Kích hoạt lại bất động sản">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav th:if="${propertiesPage != null && propertiesPage.totalPages > 1}" aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${propertiesPage.first ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin/properties(page=${propertiesPage.number - 1}, size=${pageSize})}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, propertiesPage.totalPages - 1)}" th:classappend="${i == propertiesPage.number ? 'active' : ''}">
+                                    <a class="page-link" th:href="@{/admin/properties(page=${i}, size=${pageSize})}" th:text="${i + 1}">1</a>
+                                </li>
+                                <li class="page-item" th:classappend="${propertiesPage.last ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin/properties(page=${propertiesPage.number + 1}, size=${pageSize})}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- View Property Modal -->
+    <div class="modal fade" id="viewPropertyModal" tabindex="-1" aria-labelledby="viewPropertyModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewPropertyModalLabel">Chi tiết bất động sản</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="handleModalClose()"></button>
+                </div>
+                <div class="modal-body">
+                        <div class="row mb-3">
+                        <div class="col-12 mb-3">
+                            <div id="propertyImageCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner" id="propertyImagesContainer">
+                                    <!-- Images will be loaded here by JS -->
+                            </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#propertyImageCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#propertyImageCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                            <h6>Tên bất động sản</h6>
+                            <p id="viewPropertyName" class="fw-bold"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Loại bất động sản</h6>
+                            <p id="viewPropertyType"></p>
+                        </div>
+                        </div>
+                        <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Giá (VNĐ)</h6>
+                            <p id="viewPropertyPrice" class="text-primary fw-bold"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Trạng thái</h6>
+                            <p><span id="viewPropertyStatus" class="badge"></span></p>
+                        </div>
+                        </div>
+                        <div class="mb-3">
+                        <div id="viewPropertyDeletedInfo" style="display: none;"></div>
+                        </div>
+                    <div class="mb-3">
+                        <h6>Địa chỉ</h6>
+                        <p id="viewPropertyAddress"></p>
+                </div>
+                        <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h6>Diện tích (m²)</h6>
+                            <p id="viewPropertyArea"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Số phòng ngủ</h6>
+                            <p id="viewPropertyBedrooms"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Số phòng tắm</h6>
+                            <p id="viewPropertyBathrooms"></p>
+                        </div>
+                            </div>
+                    <div class="mb-3">
+                        <h6>Thông tin môi giới</h6>
+                        <div class="d-flex align-items-center">
+                            <img id="viewRealtorAvatar" src="/assets/images/user-placeholder.png" alt="Realtor" class="rounded-circle me-2" width="40" height="40">
+                            <div>
+                                <p id="viewRealtorName" class="mb-0 fw-bold"></p>
+                                <p id="viewRealtorContact" class="mb-0 small"></p>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                        <h6>Mô tả</h6>
+                        <p id="viewPropertyDescription"></p>
+                        </div>
+                        <div class="mb-3">
+                        <h6>Thời gian đăng tin</h6>
+                        <p id="viewPropertyCreatedAt"></p>
+                            </div>
+                    <div class="mb-3">
+                        <h6>ID Bất động sản</h6>
+                        <p id="viewPropertyId"></p>
+                        </div>
+                        <div class="mb-3">
+                        <h6>Loại giao dịch</h6>
+                        <p id="viewTransactionType"></p>
+                    </div>
+                        </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning me-2" id="deactivatePropertyBtn">
+                        <i class="bi bi-ban me-1"></i> Vô hiệu hóa bất động sản
+                    </button>
+                    <button type="button" class="btn btn-success me-2" id="reactivatePropertyBtn" style="display: none;">
+                        <i class="bi bi-check-circle me-1"></i> Kích hoạt lại bất động sản
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="handleModalClose()">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{admin/footer :: footer}"></div>
+
+    <!-- Toast Container for Notifications -->
+    <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admin JS -->
+    <script src="/assets/js/admin.js"></script>
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- Admin Properties JS -->
+    <script src="/assets/js/admin-properties.js"></script>
+    <script>
+        // Cấu hình toastr - Đặt trước khi sử dụng
+        toastr.options = {
+            "closeButton": true,
+            "positionClass": "toast-bottom-right",
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        // Function to confirm deactivate property
+        function confirmDeactivateProperty(propertyId) {
+            if (confirm('Bạn có chắc chắn muốn vô hiệu hóa bất động sản này không? Một email thông báo sẽ được gửi cho môi giới.')) {
+                // Call the deactivate API
+                deactivateProperty(propertyId);
+                return true;
+            }
+            return false;
+        }
+        
+        // Function to confirm reactivate property
+        function confirmReactivateProperty(propertyId) {
+            if (confirm('Bạn có chắc chắn muốn kích hoạt lại bất động sản này không? Một email thông báo sẽ được gửi cho môi giới.')) {
+                // Call the reactivate API
+                reactivateProperty(propertyId);
+                return true;
+            }
+            return false;
+        }
+
+        // Function to handle property deactivation from modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const deactivateBtn = document.getElementById('deactivatePropertyBtn');
+            if (deactivateBtn) {
+                deactivateBtn.addEventListener('click', function() {
+                    const propertyId = this.getAttribute('data-property-id');
+                    if (propertyId) {
+                        confirmDeactivateProperty(propertyId);
+                    }
+                });
+            }
+            
+            const reactivateBtn = document.getElementById('reactivatePropertyBtn');
+            if (reactivateBtn) {
+                reactivateBtn.addEventListener('click', function() {
+                    const propertyId = this.getAttribute('data-property-id');
+                    if (propertyId) {
+                        confirmReactivateProperty(propertyId);
+                    }
+                });
+            }
+            
+            // Ensure modal event handling is properly setup
+            const modalElement = document.getElementById('viewPropertyModal');
+            if (modalElement) {
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    handleModalClose();
+                });
+            }
+        });
+        
+        // Manual cleanup for Bootstrap modal
+        function handleModalClose() {
+            // Ensure modal closing works properly
+            const body = document.body;
+            body.classList.remove('modal-open');
+            body.style.overflow = '';
+            body.style.paddingRight = '';
+            
+            // Remove modal backdrop
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            
+            // Clear carousel content
+            document.getElementById('propertyImagesContainer').innerHTML = '';
+            
+            // Reset UI state
+            const viewPropertyModal = document.getElementById('viewPropertyModal');
+            if (viewPropertyModal) {
+                viewPropertyModal.style.display = 'none';
+                viewPropertyModal.classList.remove('show');
+                viewPropertyModal.setAttribute('aria-hidden', 'true');
+            }
+        }
+    </script>
+</body>
+</html>

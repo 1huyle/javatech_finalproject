@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Yêu cầu liên hệ mới</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <p>Xin chào,</p>
+    <p>Bạn có một yêu cầu liên hệ mới cho bất động sản: <strong th:text="${propertyName}"></strong>.</p>
+    <p><strong>Thông tin người liên hệ:</strong></p>
+    <ul>
+        <li>Họ tên: <span th:text="${contactName}"></span></li>
+        <li>Email: <span th:text="${contactEmail}"></span></li>
+        <li>Điện thoại: <span th:text="${contactPhone}"></span></li>
+    </ul>
+    <p><strong>Nội dung tin nhắn:</strong></p>
+    <p th:utext="${#strings.replace(contactMessage, '\n', '<br />')}"></p>
+    <p><em>(Tin nhắn được gửi từ IP: <span th:text="${senderIpAddress}"></span>)</em></p>
+    <p>Vui lòng liên hệ lại sớm.</p>
+    <p>Trân trọng,<br />Hệ thống Real Estate (<span th:text="${siteBaseUrl}"></span>)</p>
+</body>
+</html> 
